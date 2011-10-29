@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#author: ’≈÷™¡Ÿ zhzhl202@163.com
+#author: Âº†Áü•‰∏¥ zhzhl202@163.com
 #Filename: lsa.py
 
 ''' the main function of LSA Model,include :
