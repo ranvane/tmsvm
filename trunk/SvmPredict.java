@@ -17,9 +17,9 @@ import libsvm.svm_model;
 import libsvm.svm_node;
 
 /**
- * SVM Ô¤²â³ÌĞò
- * Ö§³Ö¶àÄ£ĞÍµÄÔ¤²â¡£
- * ÊäÈëÎÄ¼şÃ»ÓĞÌØ¶¨¸ñÊ½£¬Ô¤²âÊ±ĞèÖ¸¶¨¸÷×Ö¶ÎµÄ·Ö¸ô·û¡¢·Ö´ÊµÄ·Ö¸î·ûºÅ¡¢Ã¿Ò»¸öÄ£ĞÍÔ¤²âµÄ×Ö¶Î
+ * SVM é¢„æµ‹ç¨‹åº
+ * æ”¯æŒå¤šæ¨¡å‹çš„é¢„æµ‹ã€‚
+ * è¾“å…¥æ–‡ä»¶æ²¡æœ‰ç‰¹å®šæ ¼å¼ï¼Œé¢„æµ‹æ—¶éœ€æŒ‡å®šå„å­—æ®µçš„åˆ†éš”ç¬¦ã€åˆ†è¯çš„åˆ†å‰²ç¬¦å·ã€æ¯ä¸€ä¸ªæ¨¡å‹é¢„æµ‹çš„å­—æ®µ
  * @author zhangzhilin.pt zhzhl202@163.com
  * @date 2011-10-26
  */
@@ -28,15 +28,15 @@ public class SvmPredict {
 	public static void main(String []args){
 		
 		/**
-		 * ÉçÇøÌû×Ó¼à¿ØÊ¾Àı³ÌĞò¡£ÕâÀïÑİÊ¾µÄÊÇ´ÓÎÄ¼şÖĞ¶ÁÈëÌû×ÓÊı¾İ£¬È»ºó°Ñ½á¹ûĞ´Èëµ½ÎÄ¼şÖĞ¡£
-		 * ÊäÈëµÄÊı¾İ¸ñÊ½Îª thread_id,group_id,subject,content¡£¼´Ìû×Óid,×éid,±êÌâ,ÄÚÈİ
+		 * ç¤¾åŒºå¸–å­ç›‘æ§ç¤ºä¾‹ç¨‹åºã€‚è¿™é‡Œæ¼”ç¤ºçš„æ˜¯ä»æ–‡ä»¶ä¸­è¯»å…¥å¸–å­æ•°æ®ï¼Œç„¶åæŠŠç»“æœå†™å…¥åˆ°æ–‡ä»¶ä¸­ã€‚
+		 * è¾“å…¥çš„æ•°æ®æ ¼å¼ä¸º thread_id,group_id,subject,contentã€‚å³å¸–å­id,ç»„id,æ ‡é¢˜,å†…å®¹
 		 */
 		SvmPredict libsvm = new SvmPredict();
-		String in_filename = "D:/ÕÅÖªÁÙ/Ô´´úÂë/libsvm_java/model/im_info/example.test"; //ÊäÈëÎÄ¼ş
-		String tc_splitTag="\t"; //ÊäÈëµÄÊı¾İ¸÷¸ö²¿·ÖÖ®¼äµÄ·Ö¸î·ûºÅ
-		String str_splitTag ="\\^"; //±êÌâºÍÄÚÈİ¾­¹ı·Ö´Êºó£¬¸÷¸ö´ÊµÄ·Ö¸î·ûºÅ
-		String str_connentTag ="^"; //Èç¹ûĞèÒª¶Ô¶à¸ö²¿·Ö×ÛºÏÔÚÒ»ÆğÆÀ·Ö£¬¾ÍÒªÁ¬½ÓÆğÀ´£¬ÆäÊµÕâ¸öºÍstr_splitTag±£³ÖÒ»ÖÂ£¬µ«ÊÇÒòÎªÔÚjavaÖĞ^ºÍ\\^²»ÏàÍ¬£¬ËùÒÔÒª·Ö¿ªĞ´
-		String out_filename = "D:/ÕÅÖªÁÙ/Ô´´úÂë/libsvm_java/model/im_info/result.txt"; //½á¹û±£´æµÄÎÄ¼ş			
+		String in_filename = "D:/å¼ çŸ¥ä¸´/æºä»£ç /libsvm_java/model/im_info/example.test"; //è¾“å…¥æ–‡ä»¶
+		String tc_splitTag="\t"; //è¾“å…¥çš„æ•°æ®å„ä¸ªéƒ¨åˆ†ä¹‹é—´çš„åˆ†å‰²ç¬¦å·
+		String str_splitTag ="\\^"; //æ ‡é¢˜å’Œå†…å®¹ç»è¿‡åˆ†è¯åï¼Œå„ä¸ªè¯çš„åˆ†å‰²ç¬¦å·
+		String str_connentTag ="^"; //å¦‚æœéœ€è¦å¯¹å¤šä¸ªéƒ¨åˆ†ç»¼åˆåœ¨ä¸€èµ·è¯„åˆ†ï¼Œå°±è¦è¿æ¥èµ·æ¥ï¼Œå…¶å®è¿™ä¸ªå’Œstr_splitTagä¿æŒä¸€è‡´ï¼Œä½†æ˜¯å› ä¸ºåœ¨javaä¸­^å’Œ\\^ä¸ç›¸åŒï¼Œæ‰€ä»¥è¦åˆ†å¼€å†™
+		String out_filename = "D:/å¼ çŸ¥ä¸´/æºä»£ç /libsvm_java/model/im_info/result.txt"; //ç»“æœä¿å­˜çš„æ–‡ä»¶			
 	
 		try {			
 			BufferedReader input = new BufferedReader(new FileReader(in_filename));
@@ -45,7 +45,7 @@ public class SvmPredict {
 				String line = input.readLine();	
 				if(line == null) 
 					break;
-				double[] post_sc = libsvm.cal_post_sc(line,tc_splitTag, str_splitTag, str_connentTag); //¼ÆËãÌû×ÓµÄµÃ·Ö£¨±êÌâ·Ö£¬±êÌâ+ÄÚÈİ·Ö£©
+				double[] post_sc = libsvm.cal_post_sc(line,tc_splitTag, str_splitTag, str_connentTag); //è®¡ç®—å¸–å­çš„å¾—åˆ†ï¼ˆæ ‡é¢˜åˆ†ï¼Œæ ‡é¢˜+å†…å®¹åˆ†ï¼‰
 				for(double score :post_sc)
 					output.writeBytes(score+"\t");
 				output.writeBytes("\n");
@@ -63,23 +63,23 @@ public class SvmPredict {
 	
 	
 	
-	private String model_main_path = "D:/ÕÅÖªÁÙ/Ô´´úÂë/libsvm_java/model/im_info/"; //Ä£ĞÍ´æ·ÅµÄÖ÷Â·¾¶
+	private String model_main_path = "D:/å¼ çŸ¥ä¸´/æºä»£ç /libsvm_java/model/im_info/"; //æ¨¡å‹å­˜æ”¾çš„ä¸»è·¯å¾„
 
-	private String[] dic_path ={model_main_path+"im.key"}; //´ÊµäÁĞ±í
-	private String[] model_path ={model_main_path+"im.model"}; //Ä£ĞÍÁĞ±í
-	private int[][] indexes={ {6} };//±êÌâÄ£ĞÍ¶ÔÓ¦µÄÎÄ±¾¾ÍÊÇ±êÌâ£¬¼´ÔÚÊäÈëÎÄ±¾µÄÏÂ±êÎª2¡£±êÌâ+ÄÚÈİÄ£ĞÍ¶ÔÓ¦µÄÎÄ±¾¾ÍÊÇ±êÌâºÍÄÚÈİ£¬¼´ÔÚÊäÈëÎÄ±¾µÄÏÂ±êÎª2ºÍ3
+	private String[] dic_path ={model_main_path+"im.key"}; //è¯å…¸åˆ—è¡¨
+	private String[] model_path ={model_main_path+"im.model"}; //æ¨¡å‹åˆ—è¡¨
+	private int[][] indexes={ {6} };//æ ‡é¢˜æ¨¡å‹å¯¹åº”çš„æ–‡æœ¬å°±æ˜¯æ ‡é¢˜ï¼Œå³åœ¨è¾“å…¥æ–‡æœ¬çš„ä¸‹æ ‡ä¸º2ã€‚æ ‡é¢˜+å†…å®¹æ¨¡å‹å¯¹åº”çš„æ–‡æœ¬å°±æ˜¯æ ‡é¢˜å’Œå†…å®¹ï¼Œå³åœ¨è¾“å…¥æ–‡æœ¬çš„ä¸‹æ ‡ä¸º2å’Œ3
 	
-	private List< Map<String,Integer> >  dics; //±êÌâ´Êµä,±êÌâ+ÄÚÈİ´Êµä
+	private List< Map<String,Integer> >  dics; //æ ‡é¢˜è¯å…¸,æ ‡é¢˜+å†…å®¹è¯å…¸
 	private List< svm_model> models; 
 	
 	public SvmPredict(){
 		init_model();
 	}
 	/**
-	 * 	³õÊ¼»¯²¿·Ö£º¶ÁÈëÄ£ĞÍ£¬°üÀ¨´ÊµäºÍSVMÄ£ĞÍ¡£
+	 * 	åˆå§‹åŒ–éƒ¨åˆ†ï¼šè¯»å…¥æ¨¡å‹ï¼ŒåŒ…æ‹¬è¯å…¸å’ŒSVMæ¨¡å‹ã€‚
 	 */
 	public void init_model(){
-		//¶ÁÈë´Êµä
+		//è¯»å…¥è¯å…¸
 		int k = dic_path.length;
 		dics = new ArrayList< Map<String,Integer> >();
 		models = new ArrayList< svm_model >();
@@ -96,12 +96,12 @@ public class SvmPredict {
 	}
 	
 /**
- * ¼ÆËã·ÖÊıµÄÈë¿Ú³ÌĞò£¬¸ø¶¨ÊäÈë£¬ÒÔ¼°¸÷ÖÖ·Ö¸î·ûºÅ¡£
- * È»ºóÀûÓÃËùÓĞµÄÄ£ĞÍ½øĞĞÔ¤²â·ÖÊı
- * @param line ¶ÁÈëµÄÎÄ±¾
- * @param tc_splitTag ¶ÁÈëÎÄ±¾·ÖÎª¼¸¸ö²¿·Ö£¬¸÷¸ö²¿·ÖÖ®¼äµÄ·Ö¸î·ûºÅ
- * @param str_splitTag ·Ö´ÊºóÎÄ±¾µÄ·Ö¸î·ûºÅ¡£
- * @param str_connentTag Èç¹ûÒª¶à¸ö²¿·Ö·ÅÔÚÒ»ÆğÔ¤²â£¬ĞèÒªÏÈÓÃÁ¬½Ó·ûºÅÁ¬½ÓÔÚÒ»Æğ£¬Êµ¼ÊÉÏstr_splitTagºÍstr_connentTagÊÇÒ»¸ö¶«Î÷¡£µ«ÊÇÔÚjavaÖĞÁ½Õß²»ÄÜÏàÍ¬ ^ \\^
+ * è®¡ç®—åˆ†æ•°çš„å…¥å£ç¨‹åºï¼Œç»™å®šè¾“å…¥ï¼Œä»¥åŠå„ç§åˆ†å‰²ç¬¦å·ã€‚
+ * ç„¶ååˆ©ç”¨æ‰€æœ‰çš„æ¨¡å‹è¿›è¡Œé¢„æµ‹åˆ†æ•°
+ * @param line è¯»å…¥çš„æ–‡æœ¬
+ * @param tc_splitTag è¯»å…¥æ–‡æœ¬åˆ†ä¸ºå‡ ä¸ªéƒ¨åˆ†ï¼Œå„ä¸ªéƒ¨åˆ†ä¹‹é—´çš„åˆ†å‰²ç¬¦å·
+ * @param str_splitTag åˆ†è¯åæ–‡æœ¬çš„åˆ†å‰²ç¬¦å·ã€‚
+ * @param str_connentTag å¦‚æœè¦å¤šä¸ªéƒ¨åˆ†æ”¾åœ¨ä¸€èµ·é¢„æµ‹ï¼Œéœ€è¦å…ˆç”¨è¿æ¥ç¬¦å·è¿æ¥åœ¨ä¸€èµ·ï¼Œå®é™…ä¸Šstr_splitTagå’Œstr_connentTagæ˜¯ä¸€ä¸ªä¸œè¥¿ã€‚ä½†æ˜¯åœ¨javaä¸­ä¸¤è€…ä¸èƒ½ç›¸åŒ ^ \\^
  * @return
  */
 	public double[] cal_post_sc(String line,String tc_splitTag,String str_splitTag,String str_connentTag){
@@ -121,14 +121,14 @@ public class SvmPredict {
 	}
 	
 	/**
-	 * ¼ÆËãSVMÄ£ĞÍµÄ·ÖÊı.Ö§³Ö¶àÄ£ĞÍ
-	 * @param text_arr  ÊäÈëµÄÎÄ±¾£¬±ØĞëÎªString[]¸ñÊ½
-	 * @param dic ×Öµä
-	 * @param model Ä£ĞÍ
+	 * è®¡ç®—SVMæ¨¡å‹çš„åˆ†æ•°.æ”¯æŒå¤šæ¨¡å‹
+	 * @param text_arr  è¾“å…¥çš„æ–‡æœ¬ï¼Œå¿…é¡»ä¸ºString[]æ ¼å¼
+	 * @param dic å­—å…¸
+	 * @param model æ¨¡å‹
 	 * @return
 	 */
 	public double cal_svm_sc(String[] text_arr,Map<String,Integer> dic,svm_model model){
-		Vector text = new Vector<String>(); //ÎÄ±¾Vector
+		Vector text = new Vector<String>(); //æ–‡æœ¬Vector
 		for(int i =0;i<text_arr.length;i++){
 			if (text_arr[i].trim().length()>0)
 				text.add(text_arr[i]);
@@ -137,7 +137,7 @@ public class SvmPredict {
 		int nr_class = model.nr_class;
 		double[] des_values =new double[nr_class*(nr_class-1)/2];
 		svm_node[] x = cons_pro_for_svm(text, dic);
-		if (x==null) //Èç¹û¸ÃÎÄ±¾µÄ´ÊÔÚ´Êµä ÖĞÃ»ÓĞ³öÏÖ¹ı£¬Ôò·µ»ØÒ»¸öºÜĞ¡µÄÖµ¡£
+		if (x==null) //å¦‚æœè¯¥æ–‡æœ¬çš„è¯åœ¨è¯å…¸ ä¸­æ²¡æœ‰å‡ºç°è¿‡ï¼Œåˆ™è¿”å›ä¸€ä¸ªå¾ˆå°çš„å€¼ã€‚
 			return -10;
 		double pred_result = svm.svm_predict_values(model,x,des_values);
 		if (nr_class>2)
@@ -148,17 +148,17 @@ public class SvmPredict {
 	}
 
 	/**
-	 * ¸ù¾İSVMÌØ¶¨µÄÎÊÌâ½á¹¹Ô¤²â·ÖÊı
-	 * @param x SVMÎÊÌâÌØ¶¨µÄÊäÈë¸ñÊ½
-	 * @param dic ´Êµä 
-	 * @param model Ä£ĞÍ
+	 * æ ¹æ®SVMç‰¹å®šçš„é—®é¢˜ç»“æ„é¢„æµ‹åˆ†æ•°
+	 * @param x SVMé—®é¢˜ç‰¹å®šçš„è¾“å…¥æ ¼å¼
+	 * @param dic è¯å…¸ 
+	 * @param model æ¨¡å‹
 	 * @return
 	 */
 	public double predict_svm_sc(svm_node[] x,Map<String,Integer> dic,svm_model model){
 		int nr_class = model.nr_class;
 		double[] des_values =new double[nr_class*(nr_class-1)/2];
 
-		if (x==null) //Èç¹û¸ÃÎÄ±¾µÄ´ÊÔÚ´Êµä ÖĞÃ»ÓĞ³öÏÖ¹ı£¬Ôò·µ»ØÒ»¸öºÜĞ¡µÄÖµ¡£
+		if (x==null) //å¦‚æœè¯¥æ–‡æœ¬çš„è¯åœ¨è¯å…¸ ä¸­æ²¡æœ‰å‡ºç°è¿‡ï¼Œåˆ™è¿”å›ä¸€ä¸ªå¾ˆå°çš„å€¼ã€‚
 			return -10;
 		double pred_result = svm.svm_predict_values(model,x,des_values);
 		if (nr_class>2)
@@ -168,7 +168,7 @@ public class SvmPredict {
 	}
 	
 	/**
-	 * °Ñ¼¸¸ö·Ö¿ªµÄÎÄ±¾Á¬½ÓÆğÀ´£¬ÆäÖĞÁ¬½Ó·ûºÅÒªºÍÒÔºó·Ö¸îµÄ·ûºÅÏàÍ¬
+	 * æŠŠå‡ ä¸ªåˆ†å¼€çš„æ–‡æœ¬è¿æ¥èµ·æ¥ï¼Œå…¶ä¸­è¿æ¥ç¬¦å·è¦å’Œä»¥ååˆ†å‰²çš„ç¬¦å·ç›¸åŒ
 	 * @param original_text
 	 * @param indexes
 	 * @param str_splitTag
@@ -182,12 +182,12 @@ public class SvmPredict {
 	}
 	
 	/**
-	 * ¶ÁÈë´Êµä
+	 * è¯»å…¥è¯å…¸
 	 * @param dic_path
 	 * @return
 	 */
 	public Map<String,Integer> read_dic(String dic_path){
-		Map<String,Integer>  dic = new HashMap<String,Integer>();//´Êµä´æ´¢µÄMap
+		Map<String,Integer>  dic = new HashMap<String,Integer>();//è¯å…¸å­˜å‚¨çš„Map
 		BufferedReader input;
 		try {
 			input = new BufferedReader(new FileReader(dic_path));
@@ -209,29 +209,29 @@ public class SvmPredict {
 	}
 	
 	/**
-	 * ÀûÓÃÊäÈëµÄÎÄ±¾£¬ÒÔ¼°¶ÁÈëµÄ´Êµä£¬¹¹ÔìSVMÄ£ĞÍµÄÌØ¶¨ÊäÈë
-	 * ¸Ãº¯ÊıµÄÄ¿µÄ¾ÍÊÇ¹¹ÔìÎÄ±¾µÄÌØÕ÷ÏòÁ¿£¬²¢½øĞĞ¹éÒ»»¯´¦Àí¡£µ«ÊÇ´Ë´¦ÎªÁËÌá¸ßĞ§ÂÊ£¬ÀûÓÃMap´úÌæVector£¬Ö»´æ´¢·Ç0Öµ¡£
-	 * @param text ÀïÃæ´æ´¢µÄÎªÒ»¸ö¸öµÄ´Ê
-	 * @param dic ÀûÓÃ´æ´¢µÄÎª´Êµä£¬String Îª´Ê£¬IntegerÎªÆäId
-	 * @return ·µ»ØµÄÊÇSVMÌØ¶¨µÄÊäÈë½á¹¹
+	 * åˆ©ç”¨è¾“å…¥çš„æ–‡æœ¬ï¼Œä»¥åŠè¯»å…¥çš„è¯å…¸ï¼Œæ„é€ SVMæ¨¡å‹çš„ç‰¹å®šè¾“å…¥
+	 * è¯¥å‡½æ•°çš„ç›®çš„å°±æ˜¯æ„é€ æ–‡æœ¬çš„ç‰¹å¾å‘é‡ï¼Œå¹¶è¿›è¡Œå½’ä¸€åŒ–å¤„ç†ã€‚ä½†æ˜¯æ­¤å¤„ä¸ºäº†æé«˜æ•ˆç‡ï¼Œåˆ©ç”¨Mapä»£æ›¿Vectorï¼Œåªå­˜å‚¨é0å€¼ã€‚
+	 * @param text é‡Œé¢å­˜å‚¨çš„ä¸ºä¸€ä¸ªä¸ªçš„è¯
+	 * @param dic åˆ©ç”¨å­˜å‚¨çš„ä¸ºè¯å…¸ï¼ŒString ä¸ºè¯ï¼ŒIntegerä¸ºå…¶Id
+	 * @return è¿”å›çš„æ˜¯SVMç‰¹å®šçš„è¾“å…¥ç»“æ„
 	 */
 	public svm_node[] cons_pro_for_svm(Vector<String> text,Map<String,Integer> dic){
 		Map feature_map = new HashMap<Integer,Integer>();
 		
-		//¼ÆËãÎÄ±¾ÖĞÃ¿¸ö´Ê¶ÔÓ¦Óë´ÊµäµÄÎ»ÖÃ£¬ÒÔ¼°ÏàÓ¦µÄ´ÊÆµ¡£
+		//è®¡ç®—æ–‡æœ¬ä¸­æ¯ä¸ªè¯å¯¹åº”ä¸è¯å…¸çš„ä½ç½®ï¼Œä»¥åŠç›¸åº”çš„è¯é¢‘ã€‚
 		for(int i =0;i<text.size();i++){
 			String term = (text.elementAt(i).toString()).trim();
-	        if (dic.containsKey(term)){ //²éÑ¯dicÖĞÊÇ·ñ°üº¬¸Ã´Ê
-	        	int index = dic.get(term); //Èç¹û°üº¬£¬ÔòÔÚfeature_mapÖĞÏàÓ¦Î»ÖÃ¼Ó1
-	        	if (feature_map.containsKey(index)){ //Õë¶ÔÁ½ÖÖÇé¿ö£¬Ò»ÖÖÊÇ¸Ã´ÊÒÑ¾­ÔÚ´ÊµäÖĞ£¬
+	        if (dic.containsKey(term)){ //æŸ¥è¯¢dicä¸­æ˜¯å¦åŒ…å«è¯¥è¯
+	        	int index = dic.get(term); //å¦‚æœåŒ…å«ï¼Œåˆ™åœ¨feature_mapä¸­ç›¸åº”ä½ç½®åŠ 1
+	        	if (feature_map.containsKey(index)){ //é’ˆå¯¹ä¸¤ç§æƒ…å†µï¼Œä¸€ç§æ˜¯è¯¥è¯å·²ç»åœ¨è¯å…¸ä¸­ï¼Œ
 	        		int  count = (Integer) feature_map.get(index);
 	        		feature_map .put(index, count+1);
 	        	}
-	        	else  //ÁíÒ»ÖÖÊÇ¸Ã´ÊÎ´ÔÚ´ÊµäÖĞ
+	        	else  //å¦ä¸€ç§æ˜¯è¯¥è¯æœªåœ¨è¯å…¸ä¸­
 	        		feature_map .put(index, 1);
 	        }
 		}
-		//¼ÆËã¸ÃÎÄµµÌØÕ÷ÏòÁ¿µÄÄ£
+		//è®¡ç®—è¯¥æ–‡æ¡£ç‰¹å¾å‘é‡çš„æ¨¡
 		double vec_sum = 0.0;
 		Object[] keys = feature_map.keySet().toArray();
 		for(int i=0;i<keys.length;i++){
@@ -239,19 +239,19 @@ public class SvmPredict {
 		}
 	    double vec_length=Math.sqrt(vec_sum);
 	    
-	    //¹éÒ»»¯²¢¹¹ÔìSVMÄ£ĞÍµÄÊäÈë
+	    //å½’ä¸€åŒ–å¹¶æ„é€ SVMæ¨¡å‹çš„è¾“å…¥
 	    svm_node[] x=null;
-	    Arrays.sort(keys); //¶Ôfeature_mapÖĞµÄkey½øĞĞÅÅĞò¡£Ö÷ÒªÊÇÎªÁË±£Ö¤ÊäÈëµÄSVM¸ñÊ½ÖĞIndexÊÇÉıĞòÅÅÁĞ¡£
+	    Arrays.sort(keys); //å¯¹feature_mapä¸­çš„keyè¿›è¡Œæ’åºã€‚ä¸»è¦æ˜¯ä¸ºäº†ä¿è¯è¾“å…¥çš„SVMæ ¼å¼ä¸­Indexæ˜¯å‡åºæ’åˆ—ã€‚
 	    if(vec_length>0){
 	    	int m = keys.length;
-			 x= new svm_node[m]; //SVMÄ£ĞÍµÄÊäÈë¸ñÊ½
-			/**´Ë´¦Îª¹¹ÔìSVMÊäÈë¸ñÊ½µÄ¾ä×Ó**/
-			//¼ÆËãÎÄ±¾ÖĞµÄ´Ê³öÏÖµÄ´ÊÆµÊı
+			 x= new svm_node[m]; //SVMæ¨¡å‹çš„è¾“å…¥æ ¼å¼
+			/**æ­¤å¤„ä¸ºæ„é€ SVMè¾“å…¥æ ¼å¼çš„å¥å­**/
+			//è®¡ç®—æ–‡æœ¬ä¸­çš„è¯å‡ºç°çš„è¯é¢‘æ•°
 			for(int j=0;j<m;j++)
 			{
 				x[j] = new svm_node();
 				x[j].index = (Integer)keys[j];
-				x[j].value = (double)((Integer) feature_map.get(keys[j])/vec_length); //´Ë´¦Òª½øĞĞ¹éÒ»»¯
+				x[j].value = (double)((Integer) feature_map.get(keys[j])/vec_length); //æ­¤å¤„è¦è¿›è¡Œå½’ä¸€åŒ–
 			}
 	    }
 		
