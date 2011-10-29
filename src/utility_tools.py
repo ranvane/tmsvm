@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author: 张知临 zhzhl202@163.com
 #Filename: utility_tools.py
 '''
 一些实用工具，包括

@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+#author: Lin Chih-Jen www.csie.ntu.edu.tw/~cjlin/libsvm/
 from sys import argv, exit, stdout, stderr
 from random import randint
 

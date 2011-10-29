@@ -1,3 +1,5 @@
+#!/usr/bin/python
+#author: уеж╙аы zhzhl202@163.com
 from ctm_train_model import *
 from optparse import OptionParser
 import os

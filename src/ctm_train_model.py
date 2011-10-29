@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author:张知临 zhzhl202@163.com
 #Filename: ctm_train_model.py
 '''此文件转为训练分类器模型，读入的文件格式
 Label    value1 [value2...]#即第一个为类标签，第二个为内容，中间用Tab隔开

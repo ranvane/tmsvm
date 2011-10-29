@@ -1,4 +1,5 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python
+#author: уеж╙аы zhzhl202@163.com
 #Filename: im_train.py
 from optparse import OptionParser
 from ctm_train_model import *

@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author:张知临 zhzhl202@163.com
 #Filename: grid_search_param.py
 
 '''利用grid方法搜索svm分类的最优参数'''

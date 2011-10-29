@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+#author: Lin Chih-Jen www.csie.ntu.edu.tw/~cjlin/libsvm/
+#modification уеж╙аы zhzhl202@163.com
 from svm import *
 
 def svm_read_problem(data_file_name):

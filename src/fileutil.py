@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author:张知临 zhzhl202@163.com
 #Filename: fileutil.py
 '''读写文件的一些工具
 包括读写list或二维list

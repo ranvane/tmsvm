@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# coding: utf-8
+#author: 张知临 zhzhl202@163.com
 #Filename: result_anlysis.py
 
 '''从得到的结果中分析数据

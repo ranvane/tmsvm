@@ -1,3 +1,5 @@
+#!/usr/bin/python
+#author: уеж╙аы zhzhl202@163.com
 from ctm_predict_model import *
 from ctm_train_model import cons_vec_for_cla,cons_svm_problem
 from svmutil import svm_predict,svm_load_model
