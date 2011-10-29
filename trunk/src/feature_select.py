@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author:张知临 zhzhl202@163.com
 #Filename: feature_select.py
 
 '''利用卡方进行特征选择的程序'''

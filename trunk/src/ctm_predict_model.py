@@ -1,5 +1,5 @@
-#!/usr/bin/python2.6
-# coding: gbk
+#!/usr/bin/python
+#author:张知临 zhzhl202@163.com
 #Filename: ctm_predict_model.py
 
 '''此文件主要存放一些预测所常用的函数'''

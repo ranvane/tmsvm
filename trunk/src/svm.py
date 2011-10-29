@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+#author: Lin Chih-Jen www.csie.ntu.edu.tw/~cjlin/libsvm/
 from ctypes import *
 from ctypes.util import find_library
 import sys
