@@ -1,0 +1,13 @@
+社区帖子监控模型。
+	模型文件：
+		title.key;title_content.key;title.model;title_content.model
+	输入文件格式：
+		Label	value1	[value2...]
+	模型配置：
+		词典的位置：
+		dic_path_list = [title.key,title_content.key]
+		模型的位置：
+		model_path_list = [title.model,title_content.model]
+		每个模型检测字段的位置：
+		indexes_lists = [ [1],[1,2] ]
+	
