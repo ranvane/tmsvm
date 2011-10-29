@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# coding: gbk
+# coding: utf-8
 #Filename: result_anlysis.py
 
 '''从得到的结果中分析数据
