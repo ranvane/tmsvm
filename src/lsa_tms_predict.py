@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#author: ÕÅÖªÁÙ zhzhl202@163.com
+#author: å¼ çŸ¥ä¸´ zhzhl202@163.com
 from ctm_predict_model import *
 from optparse import *
 

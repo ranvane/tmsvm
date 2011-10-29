@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#author: ’≈÷™¡Ÿ zhzhl202@163.com
+#author: Âº†Áü•‰∏¥ zhzhl202@163.com
 from ctm_train_model import *
 from optparse import OptionParser
 import os
