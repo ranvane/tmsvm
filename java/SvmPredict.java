@@ -20,7 +20,7 @@ import libsvm.svm_node;
  * SVM 预测程序
  * 支持多模型的预测。
  * 输入文件没有特定格式，预测时需指定各字段的分隔符、分词的分割符号、每一个模型预测的字段
- * @author zhangzhilin.pt zhzhl202@163.com
+ * @author 张知临 zhzhl202@163.com
  * @date 2011-10-26
  */
 public class SvmPredict {
