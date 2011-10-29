@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#author 张知临 zhzhl202@163.com
 import math 
 import sys
 sys.path.append('.')
