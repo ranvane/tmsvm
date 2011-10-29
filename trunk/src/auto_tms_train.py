@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#author:ÕÅÖªÁÙ zhzhl202@163.com
+#author:å¼ çŸ¥ä¸´ zhzhl202@163.com
 #Filename: auto_im_train.py
 from optparse import OptionParser
 from ctm_train_model import *
