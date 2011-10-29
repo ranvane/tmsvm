@@ -1,13 +1,13 @@
-ÉçÇøÌû×Ó¼à¿ØÄ£ĞÍ¡£
-	Ä£ĞÍÎÄ¼ş£º
+ç¤¾åŒºå¸–å­ç›‘æ§æ¨¡å‹ã€‚
+	æ¨¡å‹æ–‡ä»¶ï¼š
 		title.key;title_content.key;title.model;title_content.model
-	ÊäÈëÎÄ¼ş¸ñÊ½£º
+	è¾“å…¥æ–‡ä»¶æ ¼å¼ï¼š
 		Label	value1	[value2...]
-	Ä£ĞÍÅäÖÃ£º
-		´ÊµäµÄÎ»ÖÃ£º
+	æ¨¡å‹é…ç½®ï¼š
+		è¯å…¸çš„ä½ç½®ï¼š
 		dic_path_list = [title.key,title_content.key]
-		Ä£ĞÍµÄÎ»ÖÃ£º
+		æ¨¡å‹çš„ä½ç½®ï¼š
 		model_path_list = [title.model,title_content.model]
-		Ã¿¸öÄ£ĞÍ¼ì²â×Ö¶ÎµÄÎ»ÖÃ£º
+		æ¯ä¸ªæ¨¡å‹æ£€æµ‹å­—æ®µçš„ä½ç½®ï¼š
 		indexes_lists = [ [1],[1,2] ]
 	
