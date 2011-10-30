@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#_*_ coding: utf-8 _*_
 #author: 张知临 zhzhl202@163.com
 from ctm_predict_model import *
 from ctm_train_model import cons_vec_for_cla,cons_svm_problem

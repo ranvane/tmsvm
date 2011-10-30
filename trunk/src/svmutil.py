@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#_*_ coding: utf-8 _*_
 #author: Lin Chih-Jen www.csie.ntu.edu.tw/~cjlin/libsvm/
 #modification 张知临 zhzhl202@163.com
 from svm import *
