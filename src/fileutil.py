@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#_*_ coding: utf-8 _*_
 #author:张知临 zhzhl202@163.com
 #Filename: fileutil.py
 '''读写文件的一些工具

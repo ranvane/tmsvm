@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#_*_ coding: utf-8 _*_
 #author:张知临 zhzhl202@163.com
 #Filename: ctm_train_model.py
 '''此文件转为训练分类器模型，读入的文件格式
