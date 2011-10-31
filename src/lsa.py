@@ -186,6 +186,9 @@ def ctm_lsa(M,threhold,k,for_lsa_train_save_path,train_save_path,model_save_path
     save_all_sample_for_cla(train_save_path,U,S,V,sorted_list,n,M)
     save_lsa_model(U,S,V,model_save_path)
     
+def local_lsa():
+    '''set a local region,and do the local svd,'''
+    
 #sorted_list  = [10,9,8,7,6,5,4,3,2,1]
 #threhold =10
 #print select_top_n_by_threhold(sorted_list,threhold)
