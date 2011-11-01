@@ -15,7 +15,8 @@ Add your content here.  Format your content with:
 首先，要下载该软件
 可以通过svn命令将源代码check out到本地，
 {{{svn checkout http://tmsvm.googlecode.com/svn/trunk/ tmsvm}}}
+
 也可以通过svn软件直接操作，见下面的教程
-http://sae.sina.com.cn/?m=devcenter&catId=212
+[http://sae.sina.com.cn/?m=devcenter&catId=212]
 
 然后把必备的scipy和numpy安装上，见[install_Scipy_Numpy_on_Ubuntu]
