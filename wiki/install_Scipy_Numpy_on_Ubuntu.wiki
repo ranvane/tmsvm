@@ -1,0 +1,24 @@
+#install the needed software Scipy and Numpy on Ubuntu
+
+= Introduction =
+
+ref:http://www.cnblogs.com/LeftNotEasy/archive/2011/05/29/2062324.html
+
+
+= Details =
+
+Scipy在Ubuntu下的安装
+
+ # 下载scipy与numpy的package
+    http://www.scipy.org/Download#head-e68e4e32955ab584e1ac94e2b767f00179eac137
+ # sudo apt-get install libatlas-sse2-dev（科学计算库）
+ # sudo apt-get install gfortran（编译器）
+ # 执行下面的命令：
+ 在安装libatlas-sse2-dev2后，libblas.so的路径为：/usr/lib/sse2/atlas/
+ # 进入numpy的目录, 执行（安装numpy）
+   {{{python setup.py build --fcompiler=gnu95
+   sudo python setup.py install --prefix=/usr/local}}}
+ # 进入scipy的目录，执行下面相同的命令
+   {{{python setup.py build --fcompiler=gnu95
+    sudo python setup.py install --prefix=/usr/local}}}
+
