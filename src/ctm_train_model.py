@@ -116,7 +116,7 @@ def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,s
     fs.close()
 
 def extract_im_feature(filename,content_indexs,feature_indexs,dic_path,svm_model,delete,str_splitTag,tc_splitTag):
-    '''总共有5个特征位需要填充，分别是内容得分，是否有外连接、是否有QQ，所发送的链接商品ID是否同属于某个人，是否为虚拟商品'''
+    ''''''
     m = svm_load_model(svm_model)
     f = file(filename,'r')
     for line in f.readlines():
