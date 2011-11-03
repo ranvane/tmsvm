@@ -10,6 +10,7 @@ from svm import *
 from svmutil import *
 from fileutil import read_dic
 from lsa import load_lsa_model,cal_weight,pre_doc_svds
+from math import *
 
 def cal_sc(lab,m,text,dic_list,str_splitTag):
     '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
@@ -23,16 +24,54 @@ def cal_sc(lab,m,text,dic_list,str_splitTag):
 
 def cal_sc_optim(lab,m,text,dic_list,str_splitTag):
     '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
-    返回的是一个浮点数
+    返回的是一个预测标签与得分，如果是二分类，返回的是直接得分，如果为多分类，返回的是经过计算的综合分数。
     '''
     y,x = cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list)
-    p_lab,p_acc,p_sc=svm_predict(y,x,m)
+    p_lab,p_acc,p_sc=svm_predict(y,x,m)  
     #在这里要判定是二分类还是多分类，如果为二分类，返回相应的分数，如果为多分类，则返回预测的标签。
-    if len(p_sc[0])>1: #多分类，返回预测的标签
-        return p_lab[0]
-    else:             #二分类，返回具体的预测分值。
-        return p_sc[0][0]
+ 
+    return p_lab[0],sum_pre_value(p_sc[0]),number_pre_value(p_sc[0])
+  
 
+def sum_pre_value(values):
+    '''返回具有最大投票数的标签所获得分数的总和'''
+    size = len(values)
+    k = 1+int(sqrt(2*size+1))
+    vote=[0]*k
+    score=[0]*k
+    p=0
+    for i in range(k):
+        for j in range(i+1,k):
+            if values[p]>0:
+                vote[i]+=1
+                score[i]+=values[p]
+            else : 
+                vote[j]+=1
+                score[j]+=values[p]
+            p+=1
+    max = 0 
+    for i in range(1,k):
+        if vote[i]>vote[max]:
+            max = i
+    return score[max]
+
+def number_pre_value(values):
+    '''返回具有最大投票数的标签所获得支持分数的个数'''
+    size = len(values)
+    k = 1+int(sqrt(2*size+1))
+    vote=[0]*k
+    p=0
+    for i in range(k):
+        for j in range(i+1,k):
+            if values[p]>0:
+                vote[i]+=1
+            else : vote[j]+=1
+            p+=1
+    max = 0 
+    for i in range(k):
+        if vote[i]>max:
+            max = vote[i]
+    return max
 
 def ctm_predict_lsa(filename,indexes,dic_path,result_save_path,result_indexes,model_path,LSA_path,LSA_model_path,delete,str_splitTag,tc_splitTag,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''使用LSA模型进行预测的程序
@@ -94,8 +133,8 @@ def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_
         for i in indexes:
             text_temp+=str_splitTag+text[i]                   
         #sc=cal_sc(1,m,text_temp,dic_list,str_splitTag)
-        sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
-        fs.write(str(sc)+"\t")
+        label,sc,num=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+        fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             fs.write(text[index]+"\t")
         fs.write("\n")
@@ -131,8 +170,8 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
                 text_temp=""
                 for index in indexes:
                     text_temp+=str_splitTag+text[index]                   
-                sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
-            fs.write(str(sc)+"\t")
+                label,sc,num=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+            fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             if index>len(text)-1:
                 break
