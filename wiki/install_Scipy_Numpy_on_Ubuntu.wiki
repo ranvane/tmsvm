@@ -1,5 +1,5 @@
 #labels Phase-Requirements,Phase-Deploy
-#install the needed software Scipy and Numpy on Ubuntu
+install the needed software Scipy and Numpy on Ubuntu
 
 = Introduction =
 
