@@ -2,7 +2,7 @@
 
 = Introduction =
 
-在文本分类中，*降维*是一个非常重要的问题，常用的降维方式有两种：* feature selection *和 * feature extraction *。[feature_selection] 即从原词典中选择一个具有代表性的子集，常用方法有mutual information、information gain、*chi*，而feature extraction是是对原有的特征进行组合，将原高维向量空间映射到新的空低维空间上，从而达到降维的目的，常用的方法有PCA、*LSA*等。
+在文本分类中，*降维*是一个非常重要的问题，常用的降维方式有两种：* feature selection *和 * feature extraction *。[feature_selection] 即从原词典中选择一个具有代表性的子集，常用方法有mutual information、information gain、* chi *，而feature extraction是是对原有的特征进行组合，将原高维向量空间映射到新的空低维空间上，从而达到降维的目的，常用的方法有PCA、*LSA*等。
 
 
 
