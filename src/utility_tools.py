@@ -6,7 +6,7 @@
 一些实用工具，包括
 1、编码转换
 2、将样本按照比例分割成训练样本和测试样本
-
+3、
 '''
 import os.path
 from random import *
