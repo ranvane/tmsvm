@@ -10,7 +10,7 @@ from svm import *
 from svmutil import *
 from fileutil import read_dic
 from lsa import load_lsa_model,cal_weight,pre_doc_svds
-from math import *
+import math
 
 def cal_sc(lab,m,text,dic_list,str_splitTag):
     '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
@@ -36,7 +36,7 @@ def cal_sc_optim(lab,m,text,dic_list,str_splitTag):
 def sum_pre_value(values):
     '''返回具有最大投票数的标签所获得分数的总和'''
     size = len(values)
-    k = 1+int(sqrt(2*size+1))
+    k = 1+int(math.sqrt(2*size+1))
     vote=[0]*k
     score=[0]*k
     p=0
@@ -44,7 +44,7 @@ def sum_pre_value(values):
         for j in range(i+1,k):
             if values[p]>0:
                 vote[i]+=1
-                score[i]+=values[p]
+                score[i]+=math.fabs(values[p])
             else : 
                 vote[j]+=1
                 score[j]+=values[p]
@@ -58,7 +58,7 @@ def sum_pre_value(values):
 def number_pre_value(values):
     '''返回具有最大投票数的标签所获得支持分数的个数'''
     size = len(values)
-    k = 1+int(sqrt(2*size+1))
+    k = 1+int(math.sqrt(2*size+1))
     vote=[0]*k
     p=0
     for i in range(k):
