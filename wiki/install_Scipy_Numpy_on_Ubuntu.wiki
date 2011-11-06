@@ -1,5 +1,5 @@
+#summary 在Ubuntu上正确安装scipy 与numpy
 #labels Phase-Requirements,Phase-Deploy
-install the needed software Scipy and Numpy on Ubuntu
 
 = Introduction =
 
