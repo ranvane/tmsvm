@@ -2,27 +2,24 @@
 
 = Introduction =
 
-Add your content here.
+auto_tms_train.py 模块的使用详解
 
 
 = Details =
 
 ===说明===
 此函数为文本SVM分类模型自动训练程序，给定训练文本及设置相应参数，即可得到训练好的模型。
-===调用示例===
-usage:%prog [options] filename
-
-完整形式：
-Python  auto_tms_train.py  –p ../ -i 6,7,8,9,10 –w –d dic.key 
-–m im. model  -t tms.train –a tms.param –r 0.4 –S ^  ../im.train
-精简形式：
-python auto_tms_train.py   -i 6,7,8,9,10 ../im.train
-
+===调用方法===
+usage:%prog {{{[options]}}} filename
 
 ===输入格式===
-第一列为类别，如果为binary分类。最好Positive为1，Negative为-1。如果为多分类，正常样本为-1，其余的类可以选择1,2,3,4……
-其余列为内容，可以有多列内容，然后在训练模型时指定训练的列数(
--i 3,4,5 即指定第4,5,6列训练—默认列数从0开始)。
+
+{{{label value1 [value2]}}}
+
+ # 其中label是定义的类标签，如果是binary classification，建议positive样本为1，negative样本为-1。如果为multi-classification。label可以是任意的整数。
+ # 其中value必须为已经分好词的文本。可以利用ICTCLAS等分词工具预先对文本进行分词。
+ # 文本为UTF-8格式
+
 ===结果===
 模型结果会放在“model”文件夹中，里面有两个文件，默认情况下为dic.key 和 tms.model 。其中dic.key为特征选择后的词典；tms.model为训练好的SVM分类模型。
 临时文件会放在“temp”文件夹中。里面有两个文件：tms.param和tms.train。其中tms.param为SVM模型参数选择时所实验的参数。tms.train是供libtms训练器所使用的输入格式。
@@ -40,4 +37,12 @@ python auto_tms_train.py   -i 6,7,8,9,10 ../im.train
  # -T，--tc_splitTag。训练文本中各部分分割的符号，默认为”\t”
  # -S,--str_splitTag.训练文本中分词的分割词，默认为”^”
 ===Note===
-正常情况下，训练一个模型会经过特征选择，生成SVM输入格式，SVM参数选择，SVM模型训练这几个步骤。其中SVM参数选择将花费较长的时间(为了能训练出最好的模型，程序默认会进行两轮参数搜索，粗粒度和细粒度，共实验150对(c,g)，其中每对(c,g)都要经过4-flods的交叉验证。如果训练样本的个数在5000以下，整个模型的训练时间在十分钟左右，如果训练文本的数量级为万，则训练时间将达到几个小时。)。如果忍受不了这么长的时间。可以进行分步训练，或者是选择在晚上进行训练。
+正常情况下，训练一个模型会经过特征选择，生成SVM输入格式，SVM参数选择，SVM模型训练这几个步骤。其中SVM参数选择将花费较长的时间(为了能训练出最好的模型，程序默认会进行两轮参数搜索，粗粒度和细粒度，共实验150对(c,g)，其中每对(c,g)都要经过4-flods的交叉验证。如果训练样本的个数在5000以下，整个模型的训练时间在十分钟左右，如果训练文本的数量级为万，则训练时间将达到几个小时。)。如果忍受不了这么长的时间。可以进行分步训练[tms_train]，或者是选择在晚上进行训练。
+
+===调用示例===
+
+完整形式：
+$Python  auto_tms_train.py  –p ../ -i 6,7,8,9,10 –w –d dic.key 
+–m im. model  -t tms.train –a tms.param –r 0.4 –S ^  ../im.train
+精简形式：
+python auto_tms_train.py   -i 6,7,8,9,10 ../im.train
