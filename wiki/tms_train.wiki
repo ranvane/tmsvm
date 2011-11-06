@@ -13,14 +13,14 @@
 usage:%prog {{{[options]}}} filename
 filename 在步骤(-s )1,2,3中代表输入训练文本，在步骤(-s)4,5中代表SVM的输入格式数据。
 
-====自动进行模型训练====
+ # ====自动进行模型训练====
 完整形式
 python tms_train.py  -s 1 –p ../ -i 1 –w –d dic.key 
 –m im. model -t tms.train –a tms.param –r 0.4 –S ^ -T ^M  ../im.train
 精简形式：
 python tms_train.py –s 1 –p ../ -i 1 ../im.train
 
-====特征选择====
+ # ====特征选择====
 完整形式：
 python tms_train.py  -s 2 –p ../ -i 1 –d dic.key 
 –r 0.4 –S ^  ../im.train
