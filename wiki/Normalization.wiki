@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary 对文档向量进行标准化，使得所有文档向量的长度为1，避免文档长度影响效果.
 
 = Introduction =
 
