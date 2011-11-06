@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary 自动SVM分类模块的使用详解.
 
 = Introduction =
 
