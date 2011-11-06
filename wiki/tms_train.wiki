@@ -1,0 +1,9 @@
+#summary 文本SVM分类模型训练使用详解.
+
+= Introduction =
+
+文本SVM分类模型训练使用详解.参数、用法等
+
+
+= Details =
+
