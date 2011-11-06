@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary 本系统实现了macro-average、micro-average、F-measure、Recall、Precision、Accuracy等多种评价指标.
 
 = Introduction =
 
