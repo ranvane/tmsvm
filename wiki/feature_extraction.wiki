@@ -11,11 +11,12 @@
 
 而feature extraction则不同，最常用的有LSA(Latent semantic analysis)，其最关键技术就是SVD分解。即对特征-文档矩阵进行SVD分解：* X=USV' *。选取前k个特征值，然后重构X矩阵。实验证明，使用{{{X'*U(m*k)}}}即可将原训练文本映射到U空间上。在文本分类领域使用LSA方法常用的有Global SVD 和* Local SVD *。Global SVD已经被实验证明效果非常差，现在大家关注的多为Local SVD，本文实现的LSA是{{{[2]}}}中提出的一种local SVD方法
 
+==改进方向==
+ # NMF分解 
+本系统已经实现了基于LSA的特征抽取方法，见文献{{{[2]}}}。在参阅过论文中，在进行矩阵分解时也有很多人使用NMF方法，并对两种方法进行了比较，因为程序中使用了Python的csc_matrix存储大矩阵，现在还没有找到合适的NMF分解的程序
+ # 其他关于LSA方法的改进
+LSA方法在文本分类领域还没有太好经得起考验的算法，所以后续将会实验更多LSA算法，直到找出一个效果比较好的方法
 ==Reference==
 
  # F Sebastiani,Machine learning in automated text categorization ,ACM2002
  # T,Liu,Improving Text Classification using Local Latent Semantic Indexing,ICDM'04
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
