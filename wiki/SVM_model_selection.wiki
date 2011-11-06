@@ -1,4 +1,4 @@
-#SVM model selection.
+#summary SVM model selection即对SVM的参数进行选择，最常用的参数为C,如果选择RBF核函数，还应该选择g.
 
 = Introduction =
 
