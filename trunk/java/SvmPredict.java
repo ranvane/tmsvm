@@ -225,7 +225,7 @@ public class SvmPredict {
 	        	int index = dic.get(term); //如果包含，则在feature_map中相应位置加1
 	        	if (feature_map.containsKey(index)){ //针对两种情况，一种是该词已经在词典中，
 	        		int  count = (Integer) feature_map.get(index);
-	        		feature_map .put(index, count+1);
+	        		feature_map.put(index, count+1);
 	        	}
 	        	else  //另一种是该词未在词典中
 	        		feature_map .put(index, 1);
