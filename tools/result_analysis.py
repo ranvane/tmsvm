@@ -26,7 +26,7 @@ def read_result(result_save_path,indexes,dtype=float):
     f.close()
     return array(X)
 
-def cal_multi_rate(true_lab,pre_lab):
+def cal_rate(true_lab,pre_lab):
     '''
     要求输入的值必须是list。array转list: arr.tolist()。
     返回的是总的micro,macro。
@@ -48,7 +48,7 @@ def cal_multi_rate(true_lab,pre_lab):
         for v, y in zip(pre_lab, true_lab):
             if y == v and y ==la: 
                 total_correct += 1
-        l=true_lab.count(la)
+        l=list(true_lab).count(la)
         micro_acc += total_correct/float(l)
         rate[la]=[total_correct/float(l)]
     macro = micro_acc/float(len(labels))
@@ -81,39 +81,39 @@ def cal_f(true_lab,pre_lab):
         rate[lab]=[f_sc,recall,precision]
     return rate
 
-def cal_f_binary(true_lab,pre_lab,threshold=0): 
-    '''计算二分类的F值，召回率、准确率。其中<0的为正常类。>0的为违规类。
-    另外还有阈值'''
-    rate = {}
-    labels=[1.0,-1.0]
-    for lab in labels:
-        true_sum =0.0
-        pre_sum=0.0
-        right_sum=0.0
-        f_sc,recall,precision=0.0,0.0,0.0
-        for j in range(len(true_lab)):
-            if true_lab[j]*lab>0:
-                true_sum+=1.0
-                if pre_lab[j]>threshold:
-                    right_sum+=1.0
-            if pre_lab[j]>threshold:
-                pre_sum+=1.0
-        recall = right_sum/true_sum
-        if pre_sum!=0:
-            precision=right_sum/pre_sum
-        if recall+precision!=0:
-            f_sc = 2*recall*precision/(recall+precision)
-        rate[lab]=[f_sc,recall,precision]
+def cal_f_by_threshold(true_lab,pre_lab,pre_value,label,threshold): 
+    '''为指定的类别计算在当前阈值下的F值，召回率、准确率。并返回相应的词典，词典中存储了上述3个指标。'''
+    true_sum =0.0
+    pre_sum=0.0
+    right_sum=0.0
+    f_sc,recall,precision=0.0,0.0,0.0
+    rate = dict()
+    for j in range(len(true_lab)):
+        if true_lab[j]==label:
+            true_sum+=1.0
+            if pre_lab[j]==label and pre_value[j]>=threshold:
+                right_sum+=1.0
+        if pre_lab[j]==label and pre_value[j]>=threshold:
+            pre_sum+=1.0
+    recall = right_sum/true_sum
+    if pre_sum!=0:
+        precision=right_sum/pre_sum
+    if recall+precision!=0:
+        f_sc = 2*recall*precision/(recall+precision)
+    rate[label]=[f_sc,recall,precision] 
     return rate
 
-'''还要有一个是专门为二分类的阈值设定而计算的F值、召回率、准确率'''
 
-def threshlod_anlysis(true_lab,pre_lab,first_range=[i/10.0 for i in range(10)]):
+def threshlod_anlysis(true_lab,pre_lab,pre_value,first_range=[i/10.0 for i in range(10)]):
     '''对每个阈值进行分析，计算其F值、召回率、准确率'''
-    threshold_rate = {}
-    for threhold in first_range:
-       threshold_rate[threhold]=cal_f_binary(true_lab,pre_lab,threhold)
-    return threshold_rate
+    rate = {}
+    labels = {}.fromkeys(true_lab).keys()
+    for label in labels:
+        threshold_rate=dict()
+        for threhold in first_range:
+           threshold_rate[threhold]=cal_f_by_threshold(true_lab,pre_lab,pre_value,label,threhold)[label]
+        rate[label]=threshold_rate
+    return rate
 
 
 def save_result(f,rate_dic,count=0):
@@ -290,10 +290,12 @@ def main():
     usage="usage: %prog [options] filename "
     parser = OptionParser(usage=usage)
     parser.add_option("-s","--step",dest="step",type="int",default=3)
-    parser.add_option("-i","--indexes",dest="indexes",action="callback",type="string",default=[0,1],callback=list_callback)
-    parser.add_option("-p","--predicted_index",dest="predicted_index",type="int",default=0)
-    parser.add_option("-t","--true_index",dest="true_index",type="int",default=1)
+    parser.add_option("-i","--indexes",dest="indexes",action="callback",type="string",default=[0,1,2],callback=list_callback)
+    parser.add_option("-p","--predicted_label_index",dest="predicted_label_index",type="int",default=0)
+    parser.add_option("-v","--predicted_value_index",dest="predicted_value_index",type="int",default=1)
+    parser.add_option("-t","--true_label_index",dest="true_label_index",type="int",default=2)
     parser.add_option("-e","--threshold",dest="threshold",type="float",default=0)
+    parser.add_option("-l","--label",dest="label",type="float",default=1.0,help="")
     parser.add_option("-o","--output",dest="output",type="str",default="",help="输出位置，默认为标准屏幕输出")
     parser.add_option("-m","--min",dest="min",type=int,default=0,help="设定阈值的最小范围")
     parser.add_option("-M","--max",dest="max",type="int",default=1,help="设定阈值的最大范围")
@@ -310,8 +312,9 @@ def main():
     min = options.min*10
     max = options.max*10
     X = read_result(filename,indexes)
+    
     if options.step==1:
-        rate,micro,macro = cal_multi_rate(X[:,options.true_index],X[:,options.predicted_index])
+        rate,micro,macro = cal_rate(X[:,options.true_label_index],X[:,options.predicted_label_index])
         if output==False:
             print "micro = %g,macro = %g" %(micro,macro)
             print rate
@@ -321,7 +324,7 @@ def main():
             save_result(f,rate)
             
     if options.step==2:
-        rate  = cal_f(X[:,options.true_index],X[:,options.predicted_index])
+        rate  = cal_f(X[:,options.true_label_index],X[:,options.predicted_label_index])
         if output==False:
             print rate
         else:
@@ -329,15 +332,15 @@ def main():
             save_result(f,rate)
 
     if options.step==3:
-        rate  = cal_f_binary(X[:,options.true_index],X[:,options.predicted_index],options.threshold)
+        rate  = cal_f_by_threshold(X[:,options.true_label_index],X[:,options.predicted_label_index],X[:,options.predicted_value_index],options.label,options.threshold)
         if output==False:
             print rate
         else:
-            f.write("各个类别的F值、召回率、准确率")
+            f.write("类别的F值、召回率、准确率")
             save_result(f,rate)
             
     if options.step==4:
-        rate = threshlod_anlysis(X[:,options.true_index],X[:,options.predicted_index],first_range=[i/10.0 for i in range(min,max)])
+        rate = threshlod_anlysis(X[:,options.true_label_index],X[:,options.predicted_label_index],X[:,options.predicted_value_index],first_range=[i/10.0 for i in range(min,max)])
         if output==False:
             print rate
         else:

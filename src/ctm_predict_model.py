@@ -30,7 +30,7 @@ def cal_sc_optim(lab,m,text,dic_list,str_splitTag):
     p_lab,p_acc,p_sc=svm_predict(y,x,m)  
     #在这里要判定是二分类还是多分类，如果为二分类，返回相应的分数，如果为多分类，则返回预测的标签。
  
-    return p_lab[0],sum_pre_value(p_sc[0]),number_pre_value(p_sc[0])
+    return p_lab[0],sum_pre_value(p_sc[0])
   
 
 def sum_pre_value(values):
@@ -47,7 +47,7 @@ def sum_pre_value(values):
                 score[i]+=math.fabs(values[p])
             else : 
                 vote[j]+=1
-                score[j]+=values[p]
+                score[j]+=math.fabs(values[p])
             p+=1
     max = 0 
     for i in range(1,k):
@@ -133,7 +133,7 @@ def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_
         for i in indexes:
             text_temp+=str_splitTag+text[i]                   
         #sc=cal_sc(1,m,text_temp,dic_list,str_splitTag)
-        label,sc,num=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+        label,sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
         fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             fs.write(text[index]+"\t")
@@ -170,7 +170,7 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
                 text_temp=""
                 for index in indexes:
                     text_temp+=str_splitTag+text[index]                   
-                label,sc,num=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+                label,sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
             fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             if index>len(text)-1:
