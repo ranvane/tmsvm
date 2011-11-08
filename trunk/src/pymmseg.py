@@ -88,8 +88,8 @@ def dict_load_words(path):
     return True
 
 def dict_load_defaults():
-    mmseg.mmseg_load_chars(join(dirname(__file__), 'data', 'chars.dic'))
-    mmseg.mmseg_load_words(join(dirname(__file__), 'data', 'words.dic'))
+    mmseg.mmseg_load_chars(join(dirname(__file__), '.', 'chars.dic'))
+    mmseg.mmseg_load_words(join(dirname(__file__), '.', 'words.dic'))
 
 class Algorithm(object):
     def __init__(self, text):
