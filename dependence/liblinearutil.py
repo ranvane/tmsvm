@@ -20,7 +20,7 @@ def svm_read_problem(data_file_name):
 		for e in features.split():
 			ind, val = e.split(":")
 			xi[int(ind)] = float(val)
-		prob_y += [int(label)]
+		prob_y += [int(float(label))]
 		prob_x += [xi]
 	return (prob_y, prob_x)
 
@@ -59,7 +59,71 @@ def evaluations(ty, pv):
 			total_correct += 1
 	l = len(ty)
 	ACC = 100.0*total_correct/l
-	return ACC
+	return (ACC,ACC,ACC)
+
+def evaluations_multi_classify(ty, pv):
+	"""
+	evaluations(ty, pv) -> (Micro, Macro, ACC)
+	
+	Calculate accuracy, mean squared error and squared correlation coefficient
+	using the true values (ty) and predicted values (pv).
+	"""
+	if len(ty) != len(pv):
+		raise ValueError("len(ty) must equal to len(pv)")
+
+	total_correct  = 0.0
+	for v, y in zip(pv, ty):
+		if y == v: 
+			total_correct += 1.0
+	l=len(ty)
+	ACC = float(total_correct)/l
+	Micro =ACC
+	
+	labels = {}.fromkeys(ty).keys()
+	micro_acc = 0.0
+	for la in labels:
+		total_correct = 0.0
+		for v, y in zip(pv, ty):
+			if y == v and y ==la: 
+				total_correct += 1.0
+		l=ty.count(la)
+		micro_acc += total_correct/float(l)
+	Macro = micro_acc/float(len(labels))
+	return (Micro,Macro,ACC)
+	
+def evaluations_f(ty, pv):
+	'''evaluate the F-score,recall,precise'''
+    
+	tp = 0.0
+	fp = 0.0
+	fn = 0.0
+	for i in range(len(ty)):
+		if pv[i] >= 0 and ty[i] == 1:
+			tp+=1
+		else:
+			if pv[i] >= 0 and ty[i] == -1:
+				fp+=1
+			else:
+				if pv[i] <  0 and ty[i] == 1:
+					fn+=1
+
+	if tp + fp == 0 :
+		precision = 0;
+	else:
+		precision = float(tp)/ float(tp + fp)
+	if tp + fn == 0:
+		recall = 0;
+	else:
+		recall = float(tp) / float(tp + fn)
+
+	
+	if precision + recall == 0:
+		fscore = 0
+	else:
+		fscore = 2 * precision * recall / (precision + recall)
+	
+	return (fscore,recall,precision)
+
 
 def train(arg1, arg2=None, arg3=None):
 	"""
@@ -122,9 +186,16 @@ def train(arg1, arg2=None, arg3=None):
 		l, nr_fold = prob.l, param.nr_fold
 		target = (c_int * l)()
 		liblinear.cross_validation(prob, param, nr_fold, target)
-		ACC = evaluations(prob.y[:l], target[:l])
-		print("Cross Validation Accuracy = %g%%" % ACC)
-		return ACC
+		labels = {}.fromkeys(prob.y[:l]).keys()
+		if len(labels)>2:
+			Micro, Macro, ACC=evaluations_multi_classify(prob.y[:l], target[:l])
+			print "Cross Validation Micro=%g,Macro=%g" %(Micro*100,Macro*100)
+			return Micro*100
+		else:
+			f_score,recall,precision = evaluations_f(prob.y[:l], target[:l])
+			print "Cross Validation F_score = %g%%" %(f_score*100)
+			return f_score*100
+
 	else :
 		m = liblinear.train(prob, param)
 		m = toPyModel(m)
@@ -202,9 +273,17 @@ def predict(y, x, m, options=""):
 			pred_values += [values]
 	if len(y) == 0:
 		y = [0] * len(x)
-	ACC = evaluations(y, pred_labels)
-	l = len(y)
-	print("Accuracy = %g%% (%d/%d)" % (ACC, int(l*ACC//100), l))
-
-	return pred_labels, ACC, pred_values
+		
+	labels = {}.fromkeys(y).keys()
+	if len(labels)>2:
+		Micro, Macro, ACC=evaluations_multi_classify(y, pred_labels)
+		return pred_labels, (Micro, Macro, ACC), pred_values
+	else:
+		f_score,recall,presion = evaluations_f(y, pred_labels)
+		return pred_labels, (f_score,recall,presion), pred_values
+		
+	#ACC = evaluations(y, pred_labels)
+	#l = len(y)
+	#print("Accuracy = %g%% (%d/%d)" % (ACC, int(l*ACC//100), l))
+	#return pred_labels, ACC, pred_values
 	

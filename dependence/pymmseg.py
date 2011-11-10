@@ -9,7 +9,8 @@ if sys.platform == 'win32':
 else:
     ext = './mmseg.so'
     
-mmseg = cdll.LoadLibrary(ext)
+#mmseg = cdll.LoadLibrary(ext)
+mmseg = CDLL(ext)
 
 ########################################
 # the Token struct
