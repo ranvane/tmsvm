@@ -2,15 +2,20 @@
 
 import sys
 from ctypes import *
+from ctypes.util import find_library
 from os.path import join, dirname, abspath, exists
-
-if sys.platform == 'win32':
-    ext ='./mmseg.dll'
+   
+if find_library('mmseg'):
+    mmseg = CDLL(find_library('mmseg'))
 else:
-    ext = './mmseg.so'
+    if sys.platform == 'win32':
+        mmseg = CDLL('./mmseg.dll')
+    else:
+        mmseg = CDLL('./mmseg.so')    
+
     
-#mmseg = cdll.LoadLibrary(ext)
-mmseg = CDLL(ext)
+##mmseg = cdll.LoadLibrary(ext)
+#mmseg = CDLL(ext)
 
 ########################################
 # the Token struct

@@ -8,6 +8,7 @@ Label    value1 [value2...]#即第一个为类标签，第二个为内容，中�
 #from ctm_train_model_config import *
 import math
 import tms_svm
+import segment
 from fileutil import read_list,read_dic
 from ctmutil import *
 from feature_select import feature_select
@@ -38,7 +39,7 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
     segment 分词的选择：0为不进行分词；1为使用mmseg分词；2为使用aliws分词
     
     '''
-    print "-----------------现在正在进行特征选择---------------"
+
     #如果模型文件保存的路径不存在，则创建该文件夹
     dic_path= main_save_path+"model/"+dic_name
     if os.path.exists(main_save_path):
@@ -49,13 +50,24 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
         stop_words_dic=dict()
     else:
         stop_words_dic = read_dic(stopword_filename)
+    
+    #如果需要分词，则对原文件进行分词
+    if segment!=0:
+        print "-----------------正在对源文本进行分词-------------------"
+        segment_file = os.path.dirname(filename)+"/segmented"
+        segment.file_seg(filename, segment_file, str_splitTag,segment)
+        filename = segment_file
+    
+    print "-----------------现在正在进行特征选择---------------"      
     feature_select(filename,indexs,dic_path,ratio,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
     
     print "-----------------再根据特征选择后的词典构造新的SVM分类所需的训练样本-------------------"
+    #要设定SVM模型的类型
+    tms_svm.set_svm_type(svm_type)
+    
     if os.path.exists(main_save_path):
         if os.path.exists(main_save_path+"temp/") is False:
-            os.makedirs(main_save_path+"temp/")
-    #temp_name = "svm_"+ str(time.strftime('%Y-%m-%d@%H-%M-%S',time.localtime(time.time())))    
+            os.makedirs(main_save_path+"temp/")  
     
     problem_save_path  =main_save_path+"temp/"+train_name
     cons_train_sample_for_cla(filename,indexs,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
@@ -94,7 +106,7 @@ def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,s
         if len(text)<indexs[len(indexs)-1]+1:
             continue
         for i in indexs:
-          text_temp+=str_splitTag+text[i]  
+            text_temp+=str_splitTag+text[i]  
         y,x = cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list)
         if delete == True and len(x[0])==0:
             continue
@@ -104,14 +116,14 @@ def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,s
 
 def extract_im_feature(filename,content_indexs,feature_indexs,dic_path,svm_model,delete,str_splitTag,tc_splitTag):
     ''''''
-    m = svm_load_model(svm_model)
+    m = tms_svm.load_model(svm_model)
     f = file(filename,'r')
     for line in f.readlines():
         text = line.strip().split(tc_splitTag)
         text_temp=""
         for i in content_indexs:
           text_temp+=str_splitTag+text[i]  
-          p_lab,p_acc,p_sc = svm_predict() 
+          p_lab,p_acc,p_sc =tms_svm.predict() 
 
 
 
@@ -147,9 +159,9 @@ def save_train_for_lsa(test_path,model_save_path,lsa_train_save_path):
     '''predict trainset using the initial classifier  ,and save the trainset with
     lsa format : label score feature
     '''
-    y,x = svm_read_problem(test_path)
-    m = svm_load_model(model_save_path)
-    p_lab,p_acc,p_sc = svm_predict(y,x,m)
+    y,x = tms_svm.read_problem(test_path)
+    m = tms_svm.load_model(model_save_path)
+    p_lab,p_acc,p_sc = tms_svm.predict(y,x,m)
     f= file(lsa_train_save_path,'w')
     for i  in range(len(y)):
         f.write(str(int(y[i]))+"\t"+str(p_sc[i][0])+"\t")

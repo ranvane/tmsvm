@@ -4,12 +4,11 @@
 #Filename: grid_search_param.py
 
 '''利用grid方法搜索svm分类的最优参数'''
-from svm import *
-from svmutil import *
+import tms_svm
 from random import randint
 import math
 
-def grid(problem_path,result_save_path):
+def grid(problem_path,result_save_path,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step):
     '''搜索的主文件'''
     y,x  = svm_read_problem(problem_path)
     fw= file(result_save_path,'w')
