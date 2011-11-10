@@ -10,7 +10,6 @@ Macro,Micro
 
 '''
 from optparse import OptionParser
-from numpy import *
 import types
 
 def read_result(result_save_path,indexes,dtype=float):
@@ -24,7 +23,7 @@ def read_result(result_save_path,indexes,dtype=float):
             list+=[float(arr[i])]
         X+=[list]
     f.close()
-    return array(X)
+    return X
 
 def cal_rate(true_lab,pre_lab):
     '''
@@ -314,7 +313,7 @@ def main():
     X = read_result(filename,indexes)
     
     if options.step==1:
-        rate,micro,macro = cal_rate(X[:,options.true_label_index],X[:,options.predicted_label_index])
+        rate,micro,macro = cal_rate([y[options.true_label_index] for y in X ],[y[options.predicted_label_index] for y in X ])
         if output==False:
             print "micro = %g,macro = %g" %(micro,macro)
             print rate
@@ -324,7 +323,7 @@ def main():
             save_result(f,rate)
             
     if options.step==2:
-        rate  = cal_f(X[:,options.true_label_index],X[:,options.predicted_label_index])
+        rate  = cal_f([y[options.true_label_index] for y in X ],[y[options.predicted_label_index] for y in X ])
         if output==False:
             print rate
         else:
@@ -332,7 +331,7 @@ def main():
             save_result(f,rate)
 
     if options.step==3:
-        rate  = cal_f_by_threshold(X[:,options.true_label_index],X[:,options.predicted_label_index],X[:,options.predicted_value_index],options.label,options.threshold)
+        rate  = cal_f_by_threshold([y[options.true_label_index] for y in X ],[y[options.predicted_label_index] for y in X ],[y[options.predicted_value_index] for y in X],options.label,options.threshold)
         if output==False:
             print rate
         else:
@@ -340,7 +339,7 @@ def main():
             save_result(f,rate)
             
     if options.step==4:
-        rate = threshlod_anlysis(X[:,options.true_label_index],X[:,options.predicted_label_index],X[:,options.predicted_value_index],first_range=[i/10.0 for i in range(min,max)])
+        rate = threshlod_anlysis([y[options.true_label_index] for y in X ],[y[options.predicted_label_index] for y in X ],[y[options.predicted_value_index] for y in X],first_range=[i/10.0 for i in range(min,max)])
         if output==False:
             print rate
         else:

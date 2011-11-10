@@ -2,6 +2,11 @@
 #_*_ coding: utf-8 _*_
 #author:张知临 zhzhl202@163.com
 #Filename: segment.py
+import sys
+import os
+depend_path = os.path.dirname(os.getcwd())+"/dependence"
+sys.path.append(depend_path)
+
 import pymmseg as seg
 seg.dict_load_defaults()
 
