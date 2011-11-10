@@ -7,22 +7,35 @@ Label    value1 [value2...]#即第一个为类标签，第二个为内容，中�
 '''
 #from ctm_train_model_config import *
 import math
-from svm import *
-from svmutil import *
+import tms_svm
 from fileutil import read_list,read_dic
 from ctmutil import *
-from lsa import *
 from feature_select import feature_select
 from grid_search_param import grid
 import os
 import time
 
-def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_name,model_name,train_name,param_name,ratio,delete,str_splitTag,tc_splitTag):
-    '''训练的自动化程序，先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
+def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,segment):
+    '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
     然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
                  模型文件：词典.key+模型.model
                 临时文件 ：svm分类数据文件.train
+    filename 训练文本所在的文件名
+    indexs需要训练的指标项
+    main_save_path 模型保存的路径
+    stopword_filename 停用词的名称以及路径 ;
+    svm_type :svm类型：1为libsvm ;2为liblinear
+    svm_param  用户自己设定的svm的参数,这个要区分libsvm与liblinear参数的限制；例如"-s 0 -t 2 -c 0.2 "
+    dic_name 用户自定义词典名称;例如“dic.key”
+    model_name用户自定义模型名称 ;例如"svm.model"
+    train_name用户自定义训练样本名称 ；例如“svm.train”
+    param_name用户自定义参数文件名称 ；例如"svm.param"
+    ratio 特征选择保留词的比例 ；例如 0.4
+    delete对于所有特征值为0的样本是否删除,True or False
+    str_splitTag 分词所用的分割符号 例如"^"
+    tc_splitTag训练样本中各个字段分割所用的符号 ，例如"\t"
+    segment 分词的选择：0为不进行分词；1为使用mmseg分词；2为使用aliws分词
     
     '''
     print "-----------------现在正在进行特征选择---------------"
@@ -69,32 +82,6 @@ def ctm_feature_select(filename,indexs,main_save_path,dic_name,ratio,stopword_fi
         stop_words_dic = read_dic(stopword_filename)
     feature_select(filename,indexs,dic_path,ratio,stop_words_dic,str_splitTag,tc_splitTag)
 
-
-def lsa_svm_train(filename,svm_model_path,M,main_save_path,threshold,K,svm_param,for_lsa_train,train_name,param_name,model_name):
-    '''此处的filename为libsvm的格式，训练普通的模型是放置在temp中train文件。'''
-    if os.path.exists(main_save_path):
-        if os.path.exists(main_save_path+"lsa/") is False:
-            os.makedirs(main_save_path+"lsa/")
-        if os.path.exists(main_save_path+"model/") is False:
-            os.makedirs(main_save_path+"model/")
-        if os.path.exists(main_save_path+"temp/") is False:
-            os.makedirs(main_save_path+"temp/")
-    print"--------------------使用SVM模型预测训练文本，为LSA模型准备输入------------------------------"
-    for_lsa_train_save_path = main_save_path +"temp/"+for_lsa_train
-    save_train_for_lsa(filename,svm_model_path,for_lsa_train_save_path)
-    print"--------------------构造LSA模型------------------------------"
-    lsa_train_save_path = main_save_path +"temp/"+train_name
-    lsa_save_path = main_save_path +"lsa/lsa"
-    ctm_lsa(M,threshold,K,for_lsa_train_save_path,lsa_train_save_path,lsa_save_path)
-    
-    print"--------------------选择最优的c,g------------------------------"
-    search_result_save_path  = main_save_path +"temp/"+param_name
-    c,g=grid(lsa_train_save_path,search_result_save_path)
-    
-    print "-----------------根据得到的最优参数，训练模型，并将模型进行保存----------"
-    svm_param = svm_param + " -c "+str(c)+" -g "+str(g)
-    model_save_path  = main_save_path+"model/"+model_name
-    ctm_train_model(lsa_train_save_path,svm_param,model_save_path)
 
 def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
     '''根据提供的词典，将指定文件中的指定位置上的内容构造成SVM所需的问题格式，并进行保存'''
@@ -192,34 +179,7 @@ def add_sample_to_model(extra_filename,indexs,dic_path,sample_save_path,delete,s
     f.close()
     fs.close()
 
-def add_sample_to_model_lsa(extra_filename,indexs,dic_path,glo_aff_path,sample_save_path,model_path,LSA_path,LSA_model_path,delete,str_splitTag,tc_splitTag):
-    '''将之前误判的样本，放入到LSA样本中重新训练。'''
-    dic_list = read_list(dic_path,dtype=str)
-    glo_aff_list = read_list(glo_aff_path)
-    f= file(extra_filename,'r')
-    fs = file(sample_save_path,'a')
-    m= svm_load_model(model_path)
-    lsa_m = svm_load_model(LSA_model_path)
-    U = load_lsa_model(LSA_path,"U") 
-    for line in f.readlines():
-        text = line.strip().split(tc_splitTag)
-        text_temp=""
-        for i in indexs:
-          text_temp+=str_splitTag+text[i]  
-        #y,x = cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list)
-        vec = cons_vec_for_cla(text_temp.strip().split(str_splitTag),dic_list,glo_aff_list)
-        y,x=cons_svm_problem(text[0],vec)
-        p_lab,p_acc,p_sc=svm_predict(y,x,m)
-        if delete == True and len(vec)==vec.count(0):
-            continue
-        weight = cal_weight(p_sc[0][0])
-        vec = [0]*len(vec)
-        for key in x[0].keys():
-           vec[int(key)-1]= weight*float(x[0][key])
-        vec = pre_doc_svds(vec,U)
-        save_list_train_sample(fs,text[0],vec)
-    f.close()
-    fs.close()
+
 
 
 #def main():

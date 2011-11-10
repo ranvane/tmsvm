@@ -5,7 +5,7 @@
 import sys
 import os
 depend_path = os.path.dirname(os.getcwd())+"/dependence"
-sys.path.append(depend_path)
+sys.path.insert(0,depend_path)
 
 import pymmseg as seg
 seg.dict_load_defaults()
