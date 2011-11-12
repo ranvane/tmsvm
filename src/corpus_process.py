@@ -1,8 +1,7 @@
 #!/usr/bin/python
-# -*- coding: cp936 -*-
-
-#author:zhzhl202@163.com
-#Filename: corpus_process.py
+#_*_ coding: utf-8 _*_
+#author:’≈÷™¡Ÿ zhzhl202@163.com
+#Filename: ctm_predict_model.py
 
 import os
 import re

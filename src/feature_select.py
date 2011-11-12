@@ -9,17 +9,21 @@ import math
 import pickle
 from fileutil import read_dic
 
-#stopword_filename = "D:/张知临/源代码/python_ctm/Dictionary/im_info/stopwords.txt"
-#stopword_filename = "G:/x项目/Taobao/源代码/python_ctm/Dictionary/im_info/stopwords.txt"
 
-def feature_select(filename,indexes,dic_save_path,ratio,stop_words_dic,str_splitTag,tc_splitTag):
+def feature_select(filename,indexes,global_fun,dic_save_path,ratio,stop_words_dic,str_splitTag,tc_splitTag):
     '''特征选择的主函数，输入的训练样本，内容的index，特征选择后的词典保存的路径及名称，卡方选择的比例默认为40%.
     最终会选择top $ratio 的作为最终的词典。
     '''
     dic,cat_num_dic,rows=cons_dic(filename,indexes,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
     chi_score = chi_max_score(dic,cat_num_dic,rows)
     sorted_keys=sorted(chi_score.items(),key=lambda chi_score:chi_score[1],reverse=True)
-    save_keys(sorted_keys[0:int(len(chi_score)*ratio)],dic_save_path)
+    if global_fun =="idf":
+        global_weight = idf(dic,rows)
+    if global_fun =="rf":
+        global_weight = rf(dic,cat_num_dic,rows)
+    if global_fun =="one":
+        global_weight = one(dic,rows)
+    save_keys(sorted_keys[0:int(len(chi_score)*ratio)],global_weight,dic_save_path)
 
 def cons_dic(filename,indexes,stop_words_dic,str_splitTag,tc_splitTag):
     '''构造词典，主要是为了计算卡方的特征值。
@@ -109,14 +113,47 @@ def chi_avg_score(dic,cat_num_dic,rows):
         term_score[term]=chi_score
     return term_score
 
-def save_keys(keys_truple,save_path):
+def idf(dic,rows):
+    '''返回每个词的idf值，计算公式为 log(N/n+1)'''
+    global_weight =dict()
+    for key in dic.keys():
+        n = sum(dic[key].values())
+        global_weight[key] = math.log(float(rows)/(n+1.0))
+    return global_weight
+
+def rf(dic,cat_num_dic,rows):
+    '''rf = log(2+a/c)'''
+    global_weight=dict()
+    for term in dic.keys():
+        term =term.strip()
+        rf_score= 0.0
+        for cat in cat_num_dic.keys():
+            A  =  float(dic[term][cat])
+            C= float(cat_num_dic[cat]-A)
+            if C ==0:
+                rf_score=0
+            else:
+                rf_score = max(rf_score,math.log(2+A/C))
+        global_weight[term] = rf_score
+    return global_weight
+
+def one(dic,rows):
+    '''指词典中所有词的权重都为1'''
+    global_weight =dict()
+    for key in dic.keys():
+        n = sum(dic[key].values())
+        global_weight[key] = 1
+    return global_weight
+
+def save_keys(keys_truple,global_weight,save_path):
     '''the format of the key :keys,index,frequant'''  
     f = file(save_path,'w')
     count=0
     for truple in keys_truple:
         count+=1
-        f.write(truple[0].strip()+"\t"+str(count)+"\n")
+        f.write(truple[0].strip()+"\t"+str(count)+"\t"+str(global_weight[truple[0].strip()])+"\n")
     f.close()
+
 
 def save_score(score_dic,save_path):
     f = file(save_path,'w')
@@ -130,12 +167,11 @@ def save_dic(dic,save_path):
 def load_dic(load_path):
     return pickle.load(open(load_path,'r'))
 
-def main():
-    filename = "D:/张知临/源代码/python_ctm/model/im_info/trainset(4000).train"
-    indexes  = [6,7,8,9,10]
-    dic_save_path = "D:/张知临/源代码/python_ctm/model/im_info/chi_score.key"
-    ratio = 0.4
-    feature_select(filename,indexes,dic_save_path,ratio)
-    
+#def main():
+#    filename = "D:/张知临/源代码/python_ctm/model/im_info/trainset(4000).train"
+#    indexes  = [6,7,8,9,10]
+#    dic_save_path = "D:/张知临/源代码/python_ctm/model/im_info/chi_score.key"
+#    ratio = 0.4
+#    feature_select(filename,indexes,dic_save_path,ratio)
 
-    
+   
