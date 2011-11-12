@@ -8,9 +8,7 @@
 = Details =
 
 
- # 要下载该软件可以通过svn命令将源代码check out到本地，{{{svn checkout http://tmsvm.googlecode.com/svn/trunk/ tmsvm}}}。  
-也可以通过svn软件直接操作，见下面的教程 [http://sae.sina.com.cn/?m=devcenter&catId=212]。 
-或者是在http://code.google.com/p/tmsvm/downloads/list 页面将源代码下载下来。
+ # 要下载该软件可以通过svn命令将源代码check out到本地，{{{svn checkout http://tmsvm.googlecode.com/svn/trunk/ tmsvm}}}。  也可以通过svn软件直接操作，见下面的教程 [http://sae.sina.com.cn/?m=devcenter&catId=212]。  或者是在http://code.google.com/p/tmsvm/downloads/list 页面将源代码下载下来。
  # 如果想使用LSA部分，请把必备的scipy和numpy安装上，见[install_Scipy_Numpy_on_Ubuntu]，如果不适用可以跳过这一步
  # 下载程序说明文档，也在下载页面。
  # 在src/example.py为示例程序，可以通过那里的程序直接调用函数
