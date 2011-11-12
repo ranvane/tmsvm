@@ -8,11 +8,18 @@ import tms_svm
 from random import randint
 import math
 
-def grid(problem_path,result_save_path,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step):
-    '''搜索的主文件'''
-    y,x  = svm_read_problem(problem_path)
+def grid(problem_path,result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step):
+    '''搜索的主文件;
+    svm_type :使用的模型的类型。"libsvm"或者"liblinear"
+    coarse_c_range :粗粒度c搜索的范围，为一个truple (begin,end,step)
+    coarse_g_range :粗粒度g搜索的范围，为一个truple (begin,end,step)
+    fine_c_step :细粒度c搜索的步长，搜索范围为(fine_c-coarse_c_step,fine_c+coarse_c_step,fine_c_step),如果为0，则固定为(fine_c,fine_c,fine_c)
+    fine_g_step :细粒度g搜索的步长，搜索范围为(fine_g-coarse_g_step,fine_g+coarse_g_step,fine_g_step),如果为0，则固定为(fine_g,fine_g,fine_g)
+    '''
+    tms_svm.set_svm_type(svm_type)
+    y,x  = tms_svm.read_problem(problem_path)
     fw= file(result_save_path,'w')
-    c,g=grid_search_for_large_data(y,x,fw)  
+    c,g=grid_search_for_large_data(y,x,fw,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)  
     fw.close()
     return c,g
 
@@ -65,16 +72,16 @@ def calculate_jobs(c_range,g_range):
             j = j + 1
     return jobs
 
-def coarse_grid(y,x,fw,c_range=range_f(-5,7,2),g_range=range_f(3, -15, -2)):
+def coarse_grid(y,x,fw,c_range,g_range):
     '''粗粒度的grid，一般默认的步长为2，c范围是(-5,7,2)， g范围是(3, -15, -2)'''
     fw.write("-------------现在进行粗粒度的grid，Log2C=(%s %s %s),Log2G=(%s %s %s)----------\n" %\
-             (min(c_range),max(c_range),float(max(c_range)-min(c_range))/float(len(c_range)-1),min(g_range),max(g_range),float(max(g_range)-min(g_range))/float(len(g_range)-1)))
+             (min(c_range),max(c_range),float(max(c_range)-min(c_range))/float(max(1,len(c_range)-1)),min(g_range),max(g_range),float(max(g_range)-min(g_range))/float(max(len(g_range)-1,1))))
     return grid_search(y,x,fw,c_range,g_range)
 
 def better_region_grid(y,x,fw,c_range,g_range):
     '''细粒度的grid  一般来讲，是在选定的c,g的周围的一个步长范围内，新的步长为0.5'''
     fw.write("-------------现在进行细粒度的grid，Log2C=(%s %s %s),Log2G=(%s %s %s)-----------\n" %\
-             (min(c_range),max(c_range),float(max(c_range)-min(c_range))/float(len(c_range)-1),min(g_range),max(g_range),float(max(g_range)-min(g_range))/float(len(g_range)-1)))
+             (min(c_range),max(c_range),float(max(c_range)-min(c_range))/float(max(len(c_range)-1,1)),min(g_range),max(g_range),float(max(g_range)-min(g_range))/float(max(len(g_range)-1,1))))
     return grid_search(y,x,fw,c_range,g_range)
 
 def grid_search(y,x,fw,c_range,g_range):
@@ -91,7 +98,12 @@ def grid_search(y,x,fw,c_range,g_range):
     fw.write("下面是各种组合得到的交叉验证的效果：\n")
     for (c1,g1) in job:
         c,g=2**c1,2**g1
-        rate  = svm_train(y,x,"-v 4 -c "+str(c)+" -g "+str(g))
+        param="-v 4 "
+        if len(c_range)>2:
+            param+=" -c "+str(c)
+        if len(g_range)>2:
+            param+=" -g "+str(g)
+        rate  = tms_svm.train(y,x,param)
         if (c < best_c and rate > best_rate-esp ) or (c > best_c and rate-esp > best_rate) or (c== best_c and rate > best_rate) or (abs(rate-best_rate)<esp and g==best_g and c<best_c):
             best_rate = rate
             best_c,best_g=c,g
@@ -101,22 +113,35 @@ def grid_search(y,x,fw,c_range,g_range):
     fw.write("(best c = %s,g = %s,rate =%s)\n" %(best_c,best_g,best_rate))
     return best_c,best_g
 
-def grid_search_for_large_data(y,x,fw,c_range=range_f(-5,7,2),g_range=range_f(3, -15, -2)):
+def grid_search_for_large_data(y,x,fw,coarse_c_trupele,coarse_g_trupele,fine_c_step,fine_g_step):
     '''对与大型的数据集，可以先随机选取子集做grid_search,然后有了better region 后，再来做
     grid search
     '''
+    coarse_c_range =range_f(coarse_c_trupele[0],coarse_c_trupele[1],coarse_c_trupele[2])
+    coarse_g_range =range_f(coarse_g_trupele[0],coarse_g_trupele[1],coarse_g_trupele[2])
     sub_y=[]
     sub_x=[]
     l = len(y)
+    
     #子集的大小应该是根据原训练样本的大小来决定的，其容量应该初步设定为原训练样本的40%，且不超过5000，不低于2000。如果总样本的容量本来就小于2000，则就不用再选子集了。
-    subset_num=min(5000,max(min(2000,len(y)),int(len(y)*0.4)))
+    subset_num=min(5000,max(min(3000,len(y)),int(len(y)*0.4)))
     sub_y,sub_x=subset(y,x,subset_num)
     
-    c,g = coarse_grid(sub_y,sub_x,fw,c_range,g_range)
+    c,g = coarse_grid(sub_y,sub_x,fw,coarse_c_range,coarse_g_range)
     c,g=math.log(c,2),math.log(g,2)
-    coarse_step = 2
-    fine_step = 0.5
-    return better_region_grid(y,x,fw,range_f(c-coarse_step,c+coarse_step,fine_step),range_f(g-coarse_step,g+coarse_step,fine_step))
+    
+    coarse_c_step = math.fabs(coarse_c_trupele[2])
+    coarse_g_step = math.fabs(coarse_g_trupele[2])
+    if fine_c_step ==0:
+        fine_c_range = range_f(c,c,c)
+    else:
+        fine_c_range = range_f(c-coarse_c_step,c+coarse_c_step,fine_c_step)
+    if fine_g_step ==0:
+        fine_g_range = range_f(g,g,g)
+    else:
+        fine_g_range = range_f(g-coarse_g_step,g+coarse_g_step,fine_g_step)
+        
+    return better_region_grid(y,x,fw,fine_c_range,fine_g_range)
 
 
 

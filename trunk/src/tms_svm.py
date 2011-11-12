@@ -35,6 +35,20 @@ def set_svm_type(type):
         predict = liblinearutil.predict
         save_model = liblinearutil.save_model
         load_model = liblinearutil.load_model
+        
+def detect_svm_type(model):
+    f= open(model,'r')
+    svm_type = ""
+    for line in f.readlines():
+        line = line.split()
+        if line[0]=="svm_type":
+            svm_type="libsvm"
+            break
+        if line[0]=="solver_type":
+            svm_type="liblinear"
+            break
+    return svm_type
+            
 
 
      

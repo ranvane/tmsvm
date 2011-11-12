@@ -33,7 +33,7 @@ def read_list(filename,dtype=float):
 
 
 def read_dic(filename,dtype=str):
-    '''因为要维持dic顺序，'''
+    '''这里的dic的是包括2列的，：term + index，用tab分割'''
     f= file(filename,'r')
     dic={}
     count=0
@@ -45,11 +45,33 @@ def read_dic(filename,dtype=str):
         if len(line)==1:
             dic[dtype(line[0].strip())]=count
         else:
-            dic[dtype(line[0].strip())]=float(line[1])
+            dic[dtype(line[0].strip())]=int(float(line[1]))
 
     f.close()
     return dic
 
+def read_dic_ex(filename,dtype=str):
+    '''这里的dic的是包括3列的，：term + index + global_weight，用tab分割
+    dic的主键是index,
+    '''
+    f= file(filename,'r')
+    dic={}
+    global_weight ={}
+    count=0
+    for line in f.readlines():
+        line=line.split("\t")
+        count+=1
+        if len(line)<1:
+            continue
+        if len(line)==2:
+            dic[dtype(line[0].strip())]=count
+            global_weight[int(float(line[1]))] = 1
+        else:
+            dic[dtype(line[0].strip())]=int(float(line[1]))
+            global_weight[int(float(line[1]))] = float(line[2])
+
+    f.close()
+    return dic,global_weight
 
 
 '''下面两个函数为读写矩阵，使用时需要引入numpy的包
