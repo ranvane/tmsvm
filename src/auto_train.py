@@ -28,10 +28,15 @@ def main():
     parser.add_option("-m","--model_name",dest="model_name",default="tms.model")
     parser.add_option("-t","--train_name",dest="train_name",default="tms.train")
     parser.add_option("-a","--param_name",dest="param_name",default="tms.param")
-    parser.add_option("-A","--svm_param",dest="svm_param",default="'-s 0 -t 2 -c 1.0 -g 0.25'")
+    parser.add_option("-A","--svm_param",dest="svm_param",default="' '")
     parser.add_option("-r","--ratio",dest="ratio",type="float",default=0.4)
     parser.add_option("-T","--tc_splitTag",dest="tc_splitTag",type="string",default="\t")
     parser.add_option("-S","--str_splitTag",dest="str_splitTag",type="string",default="^")
+    parser.add_option("-v","--svm_type",dest="svm_type",default="libsvm",type="choice",choices=["libsvm","liblinear"])
+    parser.add_option("-e","--segment",type="choice",dest="segment",default=0,choices=[0,1,2])
+    parser.add_option("-c","--param_select",action="store_false",dest="param_select",default=True)
+    parser.add_option("-g","--global_fun",dest="global_fun",default="one",type="choice",choices=["one","idf","rf"])
+    parser.add_option("-l","--local_fun",dest="local_fun",default="tf",type="choice",choices=["tf"])
     options, args = parser.parse_args() 
     if options.indexes:
         indexes = [int(i) for i in options.indexes]
@@ -41,7 +46,7 @@ def main():
         stopword_filename = os.path.dirname(args[0])+"/stopwords.txt"
     if options.svm_param:
         svm_param = options.svm_param.replace("'","")
-    ctm_train(args[0],indexes,options.save_main_path,stopword_filename,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
+    ctm_train(args[0],indexes,options.save_main_path,stopword_filename,svm_type =options.svm_type,segment=options.segment,param_select=options.param_select,global_fun=options.global_fun,local_fun=options.local_fun,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
 
 if __name__ == "__main__":
     main()

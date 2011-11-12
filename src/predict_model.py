@@ -5,29 +5,31 @@
 
 '''此文件主要存放一些预测所常用的函数'''
 
-from ctm_train_model import cons_vec_for_cla,cons_svm_problem,cons_pro_for_svm
-from svm import *
-from svmutil import *
-from fileutil import read_dic
-from lsa import load_lsa_model,cal_weight,pre_doc_svds
+import train_model 
+import tms_svm
+import  fileutil
+import os
+import segment
 import math
+import measure
+import ctmutil
 
-def cal_sc(lab,m,text,dic_list,str_splitTag):
-    '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
-    返回的是一个浮点数
-    '''
-    vec = cons_vec_for_cla(text.strip().split(str_splitTag),dic_list)
-    y,x=cons_svm_problem(lab,vec)
-    p_lab,p_acc,p_sc=svm_predict(y,x,m)
+#def cal_sc(lab,m,text,dic_list,str_splitTag):
+#    '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
+#    返回的是一个浮点数
+#    '''
+#    vec = ctm_train_model.cons_vec_for_cla(text.strip().split(str_splitTag),dic_list)
+#    y,x=cons_svm_problem(lab,vec)
+#    p_lab,p_acc,p_sc=svm_predict(y,x,m)
+#
+#    return float(p_sc[0][0])
 
-    return float(p_sc[0][0])
-
-def cal_sc_optim(lab,m,text,dic_list,str_splitTag):
+def cal_sc_optim(lab,m,text,dic_list,global_weight,str_splitTag):
     '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
     返回的是一个预测标签与得分，如果是二分类，返回的是直接得分，如果为多分类，返回的是经过计算的综合分数。
     '''
-    y,x = cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list)
-    p_lab,p_acc,p_sc=svm_predict(y,x,m)  
+    y,x = ctmutil.cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list,measure.tf,global_weight)
+    p_lab,p_acc,p_sc=tms_svm.predict(y,x,m)  
     #在这里要判定是二分类还是多分类，如果为二分类，返回相应的分数，如果为多分类，则返回预测的标签。
  
     return p_lab[0],sum_pre_value(p_sc[0])
@@ -73,56 +75,20 @@ def number_pre_value(values):
             max = vote[i]
     return max
 
-def ctm_predict_lsa(filename,indexes,dic_path,result_save_path,result_indexes,model_path,LSA_path,LSA_model_path,delete,str_splitTag,tc_splitTag,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
-    '''使用LSA模型进行预测的程序
-    其过程为：首先使用普通的SVM模型进行打分，然后利用打分值对原向量做伸缩处理
-    最后使用LSA模型进行预测得分。
-    @param result_indexes:需要和评分结果一起存储的值。
-    '''
-    dic_list = read_dic(dic_path,dtype=str)
-    f= file(filename,'r')
-    fs = file(result_save_path,'w')
-    m= svm_load_model(model_path)
-    lsa_m = svm_load_model(LSA_model_path)
-    U = load_lsa_model(LSA_path,"U")
-
-    for line in f.readlines():
-        if change_decode ==True:
-            line = line.decode(in_decode).encode(out_encode,'ignore')
-        text = line.strip().split(tc_splitTag)
-        if len(text)<indexes[len(indexes)-1]+1 or len(text)<result_indexes[len(result_indexes)-1]+1:
-            continue
-
-        text_temp=""
-        for i in indexes:
-            text_temp+=str_splitTag+text[i]  
-        vec = cons_vec_for_cla(text_temp.strip().split(str_splitTag),dic_list)
-        y,x=cons_svm_problem(1,vec) #此处的lab 默认为1
-        p_lab,p_acc,p_sc=svm_predict(y,x,m)
-                
-        weight = cal_weight(p_sc[0][0])
-        vec = [0]*len(vec)
-        for key in x[0].keys():
-           vec[int(key)-1]= weight*float(x[0][key])
-        vec = pre_doc_svds(vec,U)
-        y,x=cons_svm_problem(text[0],vec)
-        lsa_lab,lsa_acc,lsa_sc = svm_predict(y,x,lsa_m)
-        fs.write(str(p_sc[0][0])+"\t"+str(lsa_sc[0][0])+"\t")
-        for index in result_indexes:
-            fs.write(text[index]+"\t")
-        fs.write("\n")
-
-    f.close()
-    fs.close()
-
     
     
-def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_path,str_splitTag,tc_splitTag,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
+def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_path,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''一般形式的下得模型预测，即单个模型。'''
-    dic_list = read_dic(dic_path,dtype=str)  
+    if seg!=0:
+        print "-----------------正在对源文本进行分词-------------------"
+        segment_file = os.path.dirname(filename)+"/segmented"
+        segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
+        filename = segment_file
+    dic_list,global_weight =fileutil.read_dic_ex(dic_path,dtype=str)  
     f= file(filename,'r')
     fs = file(result_save_path,'w')
-    m= svm_load_model(model_path)
+    tms_svm.set_svm_type(tms_svm.detect_svm_type(model_path))
+    m= tms_svm.load_model(model_path)
     for line in f.readlines():
         if change_decode ==True:
             line = line.decode(in_decode).encode(out_encode,'ignore')
@@ -133,7 +99,7 @@ def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_
         for i in indexes:
             text_temp+=str_splitTag+text[i]                   
         #sc=cal_sc(1,m,text_temp,dic_list,str_splitTag)
-        label,sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+        label,sc=cal_sc_optim(1,m,text_temp,dic_list,global_weight,str_splitTag)
         fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             fs.write(text[index]+"\t")
@@ -149,8 +115,9 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
     dic_lists=[]
     models=[]
     for i in range(k):
-        dic_lists.append(read_dic(dic_path_list[i],dtype=str))
-        models.append(svm_load_model(model_path_list[i]))
+        dic_lists.append(fileutil.read_dic_ex(dic_path_list[i],dtype=str))
+        tms_svm.set_svm_type(tms_svm.detect_svm_type(model_path_list[i]))
+        models.append(tms_svm.load_model(model_path_list[i]))
         
     f= file(filename,'r')
     fs = file(result_save_path,'w')
@@ -170,6 +137,10 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
                 text_temp=""
                 for index in indexes:
                     text_temp+=str_splitTag+text[index]                   
+                if dir(m).count("get_svm_type")==1:
+                    tms_svm.set_svm_type("libsvm")
+                if dir(m).count("get_nr_feature")==1:
+                    tms_svm.set_svm_type("liblinear")
                 label,sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
             fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
@@ -179,3 +150,5 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
         fs.write("\n")
     f.close()
     fs.close()
+    
+#ctm_predict_multi("../model/binary.test",[[1],[1]],["../model/dic.key","../model/dic.key"],result_save_path,result_indexes,model_path_list,str_splitTag,tc_splitTag)

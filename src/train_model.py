@@ -9,14 +9,16 @@ Label    value1 [value2...]#即第一个为类标签，第二个为内容，中�
 import math
 import tms_svm
 import segment
-from fileutil import read_list,read_dic
-from ctmutil import *
+import fileutil
+import measure
+import ctmutil 
+import types
 from feature_select import feature_select
 from grid_search_param import grid
 import os
 import time
 
-def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,segment):
+def ctm_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm_param="",dic_name="dic.key",model_name="tms.model",train_name="svm.train",svm_type="libsvm",param_name="svm.param",ratio=0.4,delete=True,str_splitTag="^",tc_splitTag="\t",seg=0,param_select=True,global_fun="one",local_fun="tf"):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
     然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
@@ -25,8 +27,8 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
     filename 训练文本所在的文件名
     indexs需要训练的指标项
     main_save_path 模型保存的路径
-    stopword_filename 停用词的名称以及路径 ;
-    svm_type :svm类型：1为libsvm ;2为liblinear
+    stopword_filename 停用词的名称以及路径 ;默认不适用停用词
+    svm_type :svm类型：libsvm 或liblinear
     svm_param  用户自己设定的svm的参数,这个要区分libsvm与liblinear参数的限制；例如"-s 0 -t 2 -c 0.2 "
     dic_name 用户自定义词典名称;例如“dic.key”
     model_name用户自定义模型名称 ;例如"svm.model"
@@ -36,8 +38,10 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
     delete对于所有特征值为0的样本是否删除,True or False
     str_splitTag 分词所用的分割符号 例如"^"
     tc_splitTag训练样本中各个字段分割所用的符号 ，例如"\t"
-    segment 分词的选择：0为不进行分词；1为使用mmseg分词；2为使用aliws分词
-    
+    seg 分词的选择：0为不进行分词；1为使用mmseg分词；2为使用aliws分词
+    param_select ;是否进行SVM模型参数的搜索。True即为使用SVM模型grid.搜索，False即为不使用参数搜索。
+    local_fun：即对特征向量计算特征权重时需要设定的计算方式:x(i,j) = local(i,j)*global(i).可选的有tf,logtf
+    global_fun :全局权重的计算方式：有"one","idf","rf"
     '''
 
     #如果模型文件保存的路径不存在，则创建该文件夹
@@ -49,17 +53,17 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
     if stopword_filename =="":
         stop_words_dic=dict()
     else:
-        stop_words_dic = read_dic(stopword_filename)
+        stop_words_dic = fileutil.read_dic(stopword_filename)
     
     #如果需要分词，则对原文件进行分词
-    if segment!=0:
+    if seg!=0:
         print "-----------------正在对源文本进行分词-------------------"
         segment_file = os.path.dirname(filename)+"/segmented"
-        segment.file_seg(filename, segment_file, str_splitTag,segment)
+        segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
     
     print "-----------------现在正在进行特征选择---------------"      
-    feature_select(filename,indexs,dic_path,ratio,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
+    feature_select(filename,indexes,global_fun,dic_path,ratio,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
     
     print "-----------------再根据特征选择后的词典构造新的SVM分类所需的训练样本-------------------"
     #要设定SVM模型的类型
@@ -70,18 +74,35 @@ def ctm_train(filename,indexs,main_save_path,stopword_filename,svm_param,dic_nam
             os.makedirs(main_save_path+"temp/")  
     
     problem_save_path  =main_save_path+"temp/"+train_name
-    cons_train_sample_for_cla(filename,indexs,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
+    if local_fun =="tf":
+        local_fun = measure.tf
+    if local_fun =="logtf":
+        local_fun = measure.logtf   
+    cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
     
-    print"--------------------选择最优的c,g------------------------------"
-    search_result_save_path  = main_save_path +"temp/"+param_name
-    c,g=grid(problem_save_path,search_result_save_path)
+    if param_select ==True:
+        print"--------------------选择最优的c,g------------------------------"
+        search_result_save_path  = main_save_path +"temp/"+param_name
+        if svm_type=="libsvm":
+           coarse_c_range=(-5,7,2)
+           coarse_g_range=(3,-10,-2)
+           fine_c_step=0.5
+           fine_g_step=0.5
+           c,g=grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
+           svm_param = svm_param + " -c "+str(c)+" -g "+str(g)
+        if svm_type=="liblinear":
+           coarse_c_range=(-5,7,2)
+           coarse_g_range=(1,1,1)
+           fine_c_step=0.5
+           fine_g_step=0
+           c,g=grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
+           svm_param = svm_param + " -c "+str(c)
     
-    print "-----------------根据得到的最优参数，训练模型，并将模型进行保存----------"
-    svm_param = svm_param + " -c "+str(c)+" -g "+str(g)
+    print "-----------------训练模型，并将模型进行保存----------"
     model_save_path  = main_save_path+"model/"+model_name
     ctm_train_model(problem_save_path,svm_param,model_save_path)
 
-def ctm_feature_select(filename,indexs,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
+def ctm_feature_select(filename,indexs=[1],global_fun="one",main_save_path="../",dic_name="dic.key",ratio=0.4,stopword_filename="",str_splitTag="^",tc_splitTag="\t"):
     #如果模型文件保存的路径不存在，则创建该文件夹
     dic_path= main_save_path+"model/"+dic_name
     if os.path.exists(main_save_path):
@@ -91,13 +112,15 @@ def ctm_feature_select(filename,indexs,main_save_path,dic_name,ratio,stopword_fi
     if stopword_filename =="":
         stop_words_dic=dict()
     else:
-        stop_words_dic = read_dic(stopword_filename)
-    feature_select(filename,indexs,dic_path,ratio,stop_words_dic,str_splitTag,tc_splitTag)
+        stop_words_dic = fileutil.read_dic(stopword_filename)
+    feature_select(filename,indexs,global_fun,dic_path,ratio,stop_words_dic,str_splitTag,tc_splitTag)
 
-
-def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
+def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
     '''根据提供的词典，将指定文件中的指定位置上的内容构造成SVM所需的问题格式，并进行保存'''
-    dic_list = read_dic(dic_path,dtype=str)
+    dic_list,global_weight = fileutil.read_dic_ex(dic_path,dtype=str)
+    if type(local_fun)==types.StringType:
+        if local_fun.strip()=="tf":
+            local_fun = measure.tf
     f= file(filename,'r')
     fs = file(sample_save_path,'w')
     for line in f.readlines():
@@ -106,8 +129,8 @@ def cons_train_sample_for_cla(filename,indexs,dic_path,sample_save_path,delete,s
         if len(text)<indexs[len(indexs)-1]+1:
             continue
         for i in indexs:
-            text_temp+=str_splitTag+text[i]  
-        y,x = cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list)
+          text_temp+=str_splitTag+text[i]  
+        y,x = ctmutil.cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list,local_fun,global_weight)
         if delete == True and len(x[0])==0:
             continue
         save_dic_train_sample(fs,y,x)
@@ -125,7 +148,10 @@ def extract_im_feature(filename,content_indexs,feature_indexs,dic_path,svm_model
           text_temp+=str_splitTag+text[i]  
           p_lab,p_acc,p_sc =tms_svm.predict() 
 
-
+def file_seg(filename,indexes=[1],out_filename="",str_splitTag="^",tc_splitTag="\t",type=1):
+    if out_filename=="":
+       out_filename = os.path.dirname(filename)+"/segmented"
+    segment.file_seg(filename, indexes, out_filename, str_splitTag, tc_splitTag, type)
 
 def save_dic_train_sample(f,y,x):
     '''将构造的svm问题格式进行保存
@@ -154,42 +180,44 @@ def save_list_train_sample(f,lab,vec):
             f.write("\t"+str(i+1)+":"+str(vec[i]))
     f.write("\n")
 
+def ctm_train_model(sample_save_path,param,model_save_path):
+    '''训练模型，输入样本文件，训练的参数，模型的保存地址，最后会给出模型在训练样本上的测试结果。'''
+    y,x = tms_svm.read_problem(sample_save_path)
+    m = tms_svm.train(y,x,param)
+    tms_svm.save_model(model_save_path,m)
+    labels = {}.fromkeys(y).keys()
+    if len(labels)>2:
+        pred_labels, (Micro, Macro, ACC), pred_values = tms_svm.predict(y,x,m)
+        print "(Micro=%g, Macro=%g, ACC=%g)"%(Micro, Macro, ACC)
+    else:
+        pred_labels, (f_score,recall,presion), pred_values=tms_svm.predict(y,x,m)
+        print "(f_score=%g,recall=%g,presion=%g)"%(f_score,recall,presion)
+    return m
 
-def save_train_for_lsa(test_path,model_save_path,lsa_train_save_path):
-    '''predict trainset using the initial classifier  ,and save the trainset with
-    lsa format : label score feature
-    '''
+def ctm_model_predict(test_path,m):
+    '''模型预测，输入测试样本，然后读入进行测试'''
     y,x = tms_svm.read_problem(test_path)
-    m = tms_svm.load_model(model_save_path)
-    p_lab,p_acc,p_sc = tms_svm.predict(y,x,m)
-    f= file(lsa_train_save_path,'w')
-    for i  in range(len(y)):
-        f.write(str(int(y[i]))+"\t"+str(p_sc[i][0])+"\t")
-        dic =x[i]
-        sorted_x = sorted(dic.items(),key = lambda dic:dic[0])
-        for key in sorted_x:
-            f.write(str(key[0])+":"+str(key[1])+"\t")
-        f.write("\n")
-    f.close()
-    
+    return tms_svm.predict(y,x,m)
 
-def add_sample_to_model(extra_filename,indexs,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
-    '''将之前误判的样本，放入到样本中重新训练。'''
-    dic_list = read_dic(dic_path,dtype=str)
-    #glo_aff_list = read_list(glo_aff_path)
-    f= file(extra_filename,'r')
-    fs = file(sample_save_path,'a')
-    for line in f.readlines():
-        text = line.strip().split(tc_splitTag)
-        text_temp=""
-        for i in indexs:
-          text_temp+=str_splitTag+text[i]  
-        y,x = cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list)
-        if delete == True and len(x)==0:
-            continue
-        save_dic_train_sample(fs,y,x)
-    f.close()
-    fs.close()
+
+
+#def add_sample_to_model(extra_filename,indexs,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
+#    '''将之前误判的样本，放入到样本中重新训练。'''
+#    dic_list = fileutil.read_dic(dic_path,dtype=str)
+#    #glo_aff_list = read_list(glo_aff_path)
+#    f= file(extra_filename,'r')
+#    fs = file(sample_save_path,'a')
+#    for line in f.readlines():
+#        text = line.strip().split(tc_splitTag)
+#        text_temp=""
+#        for i in indexs:
+#          text_temp+=str_splitTag+text[i]  
+#        y,x = ctmutil.cons_pro_for_svm(text[0],text_temp.strip().split(str_splitTag),dic_list)
+#        if delete == True and len(x)==0:
+#            continue
+#        save_dic_train_sample(fs,y,x)
+#    f.close()
+#    fs.close()
 
 
 
