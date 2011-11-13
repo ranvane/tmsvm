@@ -24,11 +24,12 @@ import ctmutil
 #
 #    return float(p_sc[0][0])
 
-def cal_sc_optim(lab,m,text,dic_list,global_weight,str_splitTag):
+def cal_sc_optim(lab,m,text,dic_list,local_fun,global_weight,str_splitTag):
     '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
     返回的是一个预测标签与得分，如果是二分类，返回的是直接得分，如果为多分类，返回的是经过计算的综合分数。
     '''
-    y,x = ctmutil.cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list,measure.tf,global_weight)
+    local_fun = measure.local_f(local_fun)
+    y,x = ctmutil.cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list,local_fun,global_weight)
     p_lab,p_acc,p_sc=tms_svm.predict(y,x,m)  
     #在这里要判定是二分类还是多分类，如果为二分类，返回相应的分数，如果为多分类，则返回预测的标签。
  
@@ -111,6 +112,12 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
     '''多个模型的预测，如一个文本有多个模型需要预测
     其中title_indexes，dic_path ，model_path为二维度的。
     '''
+    if seg!=0:
+        print "-----------------正在对源文本进行分词-------------------"
+        segment_file = os.path.dirname(filename)+"/segmented"
+        segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
+        filename = segment_file
+    
     k = len(dic_path_list) #得到预测模型的个数
     dic_lists=[]
     models=[]
@@ -141,7 +148,7 @@ def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,resu
                     tms_svm.set_svm_type("libsvm")
                 if dir(m).count("get_nr_feature")==1:
                     tms_svm.set_svm_type("liblinear")
-                label,sc=cal_sc_optim(1,m,text_temp,dic_list,str_splitTag)
+                label,sc=cal_sc_optim(1,m,text_temp,dic_list,global_weight,str_splitTag)
             fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             if index>len(text)-1:
