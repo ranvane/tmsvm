@@ -3,7 +3,7 @@
 #author:张知临 zhzhl202@163.com
 #Filename: example.py
 '''Tmsvm示例程序,演示如果调用程序'''
-import train_model #这个是训练的入口模块，需要引入
+import tms #这个是训练的入口模块，需要引入
 
 def auto_train():
     '''此示例演示如何自动对模型进行训练，输入的训练样本，并配置相应的参数。
@@ -30,7 +30,7 @@ def auto_train():
     '''
     #example 1 :指定输入文件，其他使用默认参数。
     filename = "../data/binary.train"
-    #train_model.ctm_train(filename)
+    tms.tms_train(filename)
     
     #example 2 :指定输入文件，以及设定具体的参数。对与剩余的参数也可以按照这种方式进行。
     filename = "../data/binary.train"
@@ -38,7 +38,7 @@ def auto_train():
     main_save_path ="../data/" #指定模型保存的路径。
     segment = 1 #选择使用分词
     svm_type="liblinear" #使用liblinear作为SVM模型。
-    train_model.ctm_train(filename,seg=segment,main_save_path=main_save_path,svm_type=svm_type)
+    tms.ctm_train(filename,seg=segment,main_save_path=main_save_path,svm_type=svm_type)
 
 def segment():
     '''对输入文件进行分词'''
@@ -59,8 +59,8 @@ def feature_select():
              可选的计算方式有"one","idf","rf"
     '''
     filename = "../data/binary_seged.train" 
-    train_model.ctm_feature_select(filename)
-feature_select()     
+    tms.ctm_feature_select(filename)
+auto_train()    
 
 
 

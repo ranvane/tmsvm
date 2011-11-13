@@ -18,7 +18,7 @@ from grid_search_param import grid
 import os
 import time
 
-def ctm_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm_param="",dic_name="dic.key",model_name="tms.model",train_name="svm.train",svm_type="libsvm",param_name="svm.param",ratio=0.4,delete=True,str_splitTag="^",tc_splitTag="\t",seg=0,param_select=True,global_fun="one",local_fun="tf"):
+def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
     然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
@@ -74,10 +74,7 @@ def ctm_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm
             os.makedirs(main_save_path+"temp/")  
     
     problem_save_path  =main_save_path+"temp/"+train_name
-    if local_fun =="tf":
-        local_fun = measure.tf
-    if local_fun =="logtf":
-        local_fun = measure.logtf   
+    local_fun = measure.local_f(local_fun)
     cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
     
     if param_select ==True:
@@ -100,9 +97,9 @@ def ctm_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm
     
     print "-----------------训练模型，并将模型进行保存----------"
     model_save_path  = main_save_path+"model/"+model_name
-    ctm_train_model(problem_save_path,svm_param,model_save_path)
+    ctm_train_model(problem_save_path,svm_type,svm_param,model_save_path)
 
-def ctm_feature_select(filename,indexs=[1],global_fun="one",main_save_path="../",dic_name="dic.key",ratio=0.4,stopword_filename="",str_splitTag="^",tc_splitTag="\t"):
+def ctm_feature_select(filename,indexs,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
     #如果模型文件保存的路径不存在，则创建该文件夹
     dic_path= main_save_path+"model/"+dic_name
     if os.path.exists(main_save_path):
@@ -119,8 +116,8 @@ def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_pat
     '''根据提供的词典，将指定文件中的指定位置上的内容构造成SVM所需的问题格式，并进行保存'''
     dic_list,global_weight = fileutil.read_dic_ex(dic_path,dtype=str)
     if type(local_fun)==types.StringType:
-        if local_fun.strip()=="tf":
-            local_fun = measure.tf
+        local_fun = measure.local_f(local_fun)
+
     f= file(filename,'r')
     fs = file(sample_save_path,'w')
     for line in f.readlines():
@@ -148,7 +145,7 @@ def extract_im_feature(filename,content_indexs,feature_indexs,dic_path,svm_model
           text_temp+=str_splitTag+text[i]  
           p_lab,p_acc,p_sc =tms_svm.predict() 
 
-def file_seg(filename,indexes=[1],out_filename="",str_splitTag="^",tc_splitTag="\t",type=1):
+def file_seg(filename,indexes=[1],out_filename="",str_splitTag="^",tc_splitTag="\t",seg=1):
     if out_filename=="":
        out_filename = os.path.dirname(filename)+"/segmented"
     segment.file_seg(filename, indexes, out_filename, str_splitTag, tc_splitTag, type)
@@ -180,8 +177,9 @@ def save_list_train_sample(f,lab,vec):
             f.write("\t"+str(i+1)+":"+str(vec[i]))
     f.write("\n")
 
-def ctm_train_model(sample_save_path,param,model_save_path):
+def ctm_train_model(sample_save_path,svm_type,param,model_save_path):
     '''训练模型，输入样本文件，训练的参数，模型的保存地址，最后会给出模型在训练样本上的测试结果。'''
+    tms_svm.set_svm_type(svm_type)
     y,x = tms_svm.read_problem(sample_save_path)
     m = tms_svm.train(y,x,param)
     tms_svm.save_model(model_save_path,m)

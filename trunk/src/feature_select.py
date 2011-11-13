@@ -7,6 +7,7 @@
 
 import math
 import pickle
+import measure
 from fileutil import read_dic
 
 
@@ -17,12 +18,7 @@ def feature_select(filename,indexes,global_fun,dic_save_path,ratio,stop_words_di
     dic,cat_num_dic,rows=cons_dic(filename,indexes,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
     chi_score = chi_max_score(dic,cat_num_dic,rows)
     sorted_keys=sorted(chi_score.items(),key=lambda chi_score:chi_score[1],reverse=True)
-    if global_fun =="idf":
-        global_weight = idf(dic,rows)
-    if global_fun =="rf":
-        global_weight = rf(dic,cat_num_dic,rows)
-    if global_fun =="one":
-        global_weight = one(dic,rows)
+    global_weight = measure.global_f(global_fun)(dic,cat_num_dic,rows)
     save_keys(sorted_keys[0:int(len(chi_score)*ratio)],global_weight,dic_save_path)
 
 def cons_dic(filename,indexes,stop_words_dic,str_splitTag,tc_splitTag):
@@ -112,38 +108,6 @@ def chi_avg_score(dic,cat_num_dic,rows):
             chi_score += (float(cat_num_dic[cat])/all_num_cat)*rows*math.pow(A*D-B*C,2)/((A+C)*(B+D)*(A+B)*(C+D))
         term_score[term]=chi_score
     return term_score
-
-def idf(dic,rows):
-    '''返回每个词的idf值，计算公式为 log(N/n+1)'''
-    global_weight =dict()
-    for key in dic.keys():
-        n = sum(dic[key].values())
-        global_weight[key] = math.log(float(rows)/(n+1.0))
-    return global_weight
-
-def rf(dic,cat_num_dic,rows):
-    '''rf = log(2+a/c)'''
-    global_weight=dict()
-    for term in dic.keys():
-        term =term.strip()
-        rf_score= 0.0
-        for cat in cat_num_dic.keys():
-            A  =  float(dic[term][cat])
-            C= float(cat_num_dic[cat]-A)
-            if C ==0:
-                rf_score=0
-            else:
-                rf_score = max(rf_score,math.log(2+A/C))
-        global_weight[term] = rf_score
-    return global_weight
-
-def one(dic,rows):
-    '''指词典中所有词的权重都为1'''
-    global_weight =dict()
-    for key in dic.keys():
-        n = sum(dic[key].values())
-        global_weight[key] = 1
-    return global_weight
 
 def save_keys(keys_truple,global_weight,save_path):
     '''the format of the key :keys,index,frequant'''  
