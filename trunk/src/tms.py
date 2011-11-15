@@ -4,12 +4,18 @@
 #Filename: tms.py
 '''tmsvm系统的入口程序.'''
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"src"))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"lsa_src"))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"tools"))
 import train_model
 import predict_model
 import grid_search_param
 import tms_svm
 
-def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm_param="",dic_name="dic.key",model_name="tms.model",train_name="svm.train",svm_type="libsvm",param_name="svm.param",ratio=0.4,delete=True,str_splitTag="^",tc_splitTag="\t",seg=0,param_select=True,global_fun="one",local_fun="tf"):
+def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm_param="",config_name="tms.config",dic_name="dic.key",model_name="tms.model",train_name="svm.train",svm_type="libsvm",param_name="svm.param",ratio=0.4,delete=True,str_splitTag="^",tc_splitTag="\t",seg=0,param_select=True,global_fun="one",local_fun="tf"):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。 然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
     必须参数：
@@ -35,7 +41,7 @@ def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm
     local_fun：即对特征向量计算特征权重时需要设定的计算方式:x(i,j) = local(i,j)*global(i).可选的有tf。默认为"tf"
     global_fun :全局权重的计算方式：有"one","idf","rf" ,默认为"one"
     '''
-    train_model.ctm_train(filename, indexes, main_save_path, stopword_filename, svm_param, dic_name, model_name, train_name, svm_type, param_name, ratio, delete, str_splitTag, tc_splitTag, seg, param_select, global_fun, local_fun)
+    train_model.ctm_train(filename, indexes, main_save_path, stopword_filename, svm_param, config_name, dic_name, model_name, train_name, svm_type, param_name, ratio, delete, str_splitTag, tc_splitTag, seg, param_select, global_fun, local_fun)
 
 def tms_segment(filename,indexes=[1],out_filename="",str_splitTag="^",tc_splitTag="\t",seg=1):
     '''分词的主程序

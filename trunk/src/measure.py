@@ -8,6 +8,10 @@ import types
 
 tf = lambda x: x
 logtf = lambda x: math.log(x)
+def binary(x):
+    if x<0:
+        return 1
+    return 0
 
 def local_f(fun_type):
     if type(fun_type)==types.StringType:
@@ -15,6 +19,8 @@ def local_f(fun_type):
             return tf
         if type =="logtf":
             return logtf
+        if type=="binary":
+            return binary
     if type(fun_type)==types.FunctionType:
         return fun_type
     

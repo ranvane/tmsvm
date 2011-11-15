@@ -18,7 +18,7 @@ from grid_search_param import grid
 import os
 import time
 
-def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun):
+def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config_name,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
     然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
@@ -44,11 +44,17 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,dic_na
     global_fun :全局权重的计算方式：有"one","idf","rf"
     '''
 
-    #如果模型文件保存的路径不存在，则创建该文件夹
-    dic_path= main_save_path+"model/"+dic_name
+    print "创建模型文件保存的路径"
     if os.path.exists(main_save_path):
-        if os.path.exists(main_save_path+"model/") is False:
-            os.makedirs(main_save_path+"model/")
+        if os.path.exists(os.path.join(main_save_path,"model")) is False:
+            os.makedirs(os.path.join(main_save_path,"model"))
+    if os.path.exists(main_save_path):
+        if os.path.exists(os.path.join(main_save_path,"temp")) is False:
+            os.makedirs(os.path.join(main_save_path,"temp"))
+    
+    #设定SVM模型的类型。  
+    tms_svm.set_svm_type(svm_type)   
+        
     #如果没有给出停用词的文件名，则默认不使用停用词
     if stopword_filename =="":
         stop_words_dic=dict()
@@ -62,18 +68,12 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,dic_na
         segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
     
-    print "-----------------现在正在进行特征选择---------------"      
+    print "-----------------现在正在进行特征选择---------------"  
+    dic_path= os.path.join(main_save_path,"model",dic_name)    
     feature_select(filename,indexes,global_fun,dic_path,ratio,stop_words_dic,str_splitTag=str_splitTag,tc_splitTag=tc_splitTag)
     
-    print "-----------------再根据特征选择后的词典构造新的SVM分类所需的训练样本-------------------"
-    #要设定SVM模型的类型
-    tms_svm.set_svm_type(svm_type)
-    
-    if os.path.exists(main_save_path):
-        if os.path.exists(main_save_path+"temp/") is False:
-            os.makedirs(main_save_path+"temp/")  
-    
-    problem_save_path  =main_save_path+"temp/"+train_name
+    print "-----------------再根据特征选择后的词典构造新的SVM分类所需的训练样本------------------- "
+    problem_save_path  = os.path.join(main_save_path,"temp",train_name)
     local_fun = measure.local_f(local_fun)
     cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
     
@@ -98,6 +98,22 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,dic_na
     print "-----------------训练模型，并将模型进行保存----------"
     model_save_path  = main_save_path+"model/"+model_name
     ctm_train_model(problem_save_path,svm_type,svm_param,model_save_path)
+    
+    print "保存模型配置"
+    f_config = file(os.path.join(main_save_path,"model",config_name))
+    save_config(f_config,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param)
+    f_config.close()
+
+def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param):
+    '''保存模型配置文件'''
+    f.write("SvmType:"+str(svm_type).strip()+"\n")
+    f.write("SvmParam:"+str(svm_param).strip()+"\n")
+    f.write("DicName:"+str(dic_name).strip()+"\n")
+    f.write("ModelName:"+str(model_name).strip()+"\n")
+    f.write("LocalFun:"+str(local_fun).strip()+"\n")
+    f.write("GlobalFun:"+str(global_fun).strip()+"\n")
+    f.write("WordSeg:"+str(seg).strip()+"\n")
+    f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.gmtime()))
 
 def ctm_feature_select(filename,indexs,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
     #如果模型文件保存的路径不存在，则创建该文件夹
