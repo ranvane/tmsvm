@@ -76,20 +76,35 @@ def number_pre_value(values):
             max = vote[i]
     return max
 
+def load_tms_model(config_file):
+    '''通过模型配置文件加载词典、全局因子、局部因子、SVM模型'''
+    model_main_path = os.path.dirname(config_file)
+    f = file(config_file,'r')
+    for line in f.readlines():
+        text = line.split(":")
+        if text[0].strip()=="DicName":
+            dic,global_weight = fileutil.read_dic_ex(os.path.join(model_main_path,text[1].strip()),dtype=str)
+        if text[0].strip()=="ModelName":
+            tms_svm.set_svm_type(tms_svm.detect_svm_type(os.path.join(model_main_path,text[1].strip())))
+            model= tms_svm.load_model(os.path.join(model_main_path,text[1].strip()))
+        if text[0].strip()=="LocalFun":
+            local_fun = measure.local_f(text[1].strip())
+        if text[0].strip()=="WordSeg":
+            seg = int(float(text[1]))
+    return local_fun,dic,global_weight,model,seg
     
-    
-def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_path,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
+def ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''一般形式的下得模型预测，即单个模型。'''
+    local_fun,dic,global_weight,model,seg_ori = load_tms_model(config_file) 
     if seg!=0:
+        if seg_ori !=seg:
+            print "预测分词工具与原训练时分词工具不一样"
         print "-----------------正在对源文本进行分词-------------------"
         segment_file = os.path.dirname(filename)+"/segmented"
         segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
-    dic_list,global_weight =fileutil.read_dic_ex(dic_path,dtype=str)  
     f= file(filename,'r')
     fs = file(result_save_path,'w')
-    tms_svm.set_svm_type(tms_svm.detect_svm_type(model_path))
-    m= tms_svm.load_model(model_path)
     for line in f.readlines():
         if change_decode ==True:
             line = line.decode(in_decode).encode(out_encode,'ignore')
@@ -100,7 +115,7 @@ def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_
         for i in indexes:
             text_temp+=str_splitTag+text[i]                   
         #sc=cal_sc(1,m,text_temp,dic_list,str_splitTag)
-        label,sc=cal_sc_optim(1,m,text_temp,dic_list,global_weight,str_splitTag)
+        label,sc=cal_sc_optim(1,m,text_temp,dic_list,local_fun,global_weight,str_splitTag)
         fs.write(str(label)+"\t"+str(sc)+"\t")
         for index in result_indexes:
             fs.write(text[index]+"\t")
@@ -108,21 +123,26 @@ def ctm_predict(filename,indexes,dic_path,result_save_path,result_indexes,model_
     f.close()
     fs.close()
 
-def ctm_predict_multi(filename,indexes_lists,dic_path_list,result_save_path,result_indexes,model_path_list,str_splitTag,tc_splitTag,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
+def ctm_predict_multi(filename,indexes_lists,loca_fun_list,dic_path_list,result_save_path,result_indexes,model_path_list,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''多个模型的预测，如一个文本有多个模型需要预测
     其中title_indexes，dic_path ，model_path为二维度的。
     '''
     if seg!=0:
         print "-----------------正在对源文本进行分词-------------------"
+        all_index = list()
+        for index in indexes_lists:
+            all_index.extend(index)
         segment_file = os.path.dirname(filename)+"/segmented"
-        segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
+        segment.file_seg(filename,all_index,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
-    
+     = measure.local_f(local_fun)
     k = len(dic_path_list) #得到预测模型的个数
     dic_lists=[]
+    local_fun_list=[]
     models=[]
     for i in range(k):
         dic_lists.append(fileutil.read_dic_ex(dic_path_list[i],dtype=str))
+        local_fun_list.append()
         tms_svm.set_svm_type(tms_svm.detect_svm_type(model_path_list[i]))
         models.append(tms_svm.load_model(model_path_list[i]))
         
