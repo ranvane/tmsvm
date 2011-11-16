@@ -3,7 +3,7 @@
 #author:张知临 zhzhl202@163.com
 #Filename: auto_im_train.py
 from optparse import OptionParser
-from ctm_train_model import *
+import train_model
 import os
 
 '''
@@ -24,6 +24,7 @@ def main():
     parser.add_option("-p","--path",dest="save_main_path",default="../")
     parser.add_option("-i","--indexes",dest="indexes",action="callback",type="string",default=[1],callback=list_callback)
     parser.add_option("-w","--stopword",action="store_false",dest="stopword",default=True)
+    parser.add_option("-n","--config_name",dest="config_name",default="tms.config")
     parser.add_option("-d","--dic_name",dest="dic_name",default="dic.key")
     parser.add_option("-m","--model_name",dest="model_name",default="tms.model")
     parser.add_option("-t","--train_name",dest="train_name",default="tms.train")
@@ -46,7 +47,8 @@ def main():
         stopword_filename = os.path.dirname(args[0])+"/stopwords.txt"
     if options.svm_param:
         svm_param = options.svm_param.replace("'","")
-    ctm_train(args[0],indexes,options.save_main_path,stopword_filename,svm_type =options.svm_type,segment=options.segment,param_select=options.param_select,global_fun=options.global_fun,local_fun=options.local_fun,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
+    
+    train_model.ctm_train(args[0],indexes,options.save_main_path,stopword_filename,config_name=options.config_name,svm_type =options.svm_type,seg=options.segment,param_select=options.param_select,global_fun=options.global_fun,local_fun=options.local_fun,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
 
 if __name__ == "__main__":
     main()

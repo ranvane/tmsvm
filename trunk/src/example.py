@@ -13,4 +13,5 @@ import tms
 #tms.tms_analysis("../data/binary_seged.result")
 
 '''配置多个模型进行预测'''
-tms.tms_predict_multi("../data/binary_seged.test", ["../data/libsvm_model/tms.config","../data/liblinear_model/tms.config"],indexes_lists=[[1],[1]],result_save_path="../data/binary_seged.result")
+#tms.tms_predict_multi("../data/binary_seged.test", ["../data/libsvm_model/tms.config","../data/liblinear_model/tms.config"],indexes_lists=[[1],[1]],result_save_path="../data/binary_seged.result")
+tms.tms_analysis("../data/binary_seged.result",indexes=[0,1,2,3,4],true_label_index=4)
