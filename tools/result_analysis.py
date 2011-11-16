@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #_*_ coding: utf-8 _*_
 #author: 张知临 zhzhl202@163.com
-#Filename: result_anlysis.py
+#Filename: result_analysis.py
 
 '''从得到的结果中分析数据
 统计分类的正确率Rate = correct/all
@@ -319,7 +319,7 @@ def main():
             print rate
         else:
             f.write("micro = %g,macro = %g\n" %(micro,macro))
-            f.write("各个类别的F值、召回率、准确率")
+            f.write("各个类别的分类准确率")
             save_result(f,rate)
             
     if options.step==2:
@@ -335,7 +335,7 @@ def main():
         if output==False:
             print rate
         else:
-            f.write("类别的F值、召回率、准确率")
+            f.write("对特定类别的F值、召回率、准确率")
             save_result(f,rate)
             
     if options.step==4:
@@ -343,7 +343,7 @@ def main():
         if output==False:
             print rate
         else:
-            f.write("各个类别的F值、召回率、准确率")
+            f.write("所有类别各个阈值下得F值、召回率、准确率")
             save_result(f,rate)
         
     if output ==True:
