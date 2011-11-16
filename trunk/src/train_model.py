@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #_*_ coding: utf-8 _*_
 #author:张知临 zhzhl202@163.com
-#Filename: ctm_train_model.py
+#Filename: train_model.py
 '''此文件转为训练分类器模型，读入的文件格式
 Label    value1 [value2...]#即第一个为类标签，第二个为内容，中间用Tab隔开
 '''
@@ -74,6 +74,7 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
     
     print "-----------------再根据特征选择后的词典构造新的SVM分类所需的训练样本------------------- "
     problem_save_path  = os.path.join(main_save_path,"temp",train_name)
+    local_fun_str = local_fun
     local_fun = measure.local_f(local_fun)
     cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
     
@@ -100,8 +101,8 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
     ctm_train_model(problem_save_path,svm_type,svm_param,model_save_path)
     
     print "保存模型配置"
-    f_config = file(os.path.join(main_save_path,"model",config_name))
-    save_config(f_config,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param)
+    f_config = file(os.path.join(main_save_path,"model",config_name),'w')
+    save_config(f_config,dic_name,model_name,local_fun_str,global_fun,seg,svm_type,svm_param)
     f_config.close()
 
 def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param):
