@@ -4,6 +4,7 @@ import sys
 from ctypes import *
 from ctypes.util import find_library
 from os.path import join, dirname, abspath, exists
+import os
    
 if find_library('mmseg'):
     mmseg = CDLL(find_library('mmseg'))
