@@ -14,7 +14,7 @@ else:
 	if sys.platform == 'win32':
 		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"libsvm.dll"))
 	else:
-		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"libsvm.so"))
+		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"libsvm.so.1"))
 print 
 
 # Construct constants

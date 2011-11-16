@@ -11,7 +11,7 @@ else:
     if sys.platform == 'win32':
         mmseg = CDLL(os.path.join(os.path.dirname(__file__),"./mmseg.dll"))
     else:
-        mmseg = CDLL(os.path.join(os.path.dirname(__file__),"./mmseg.so"))    
+        mmseg = CDLL(os.path.join(os.path.dirname(__file__),"./mmseg.so.1"))    
 
     
 ##mmseg = cdll.LoadLibrary(ext)
