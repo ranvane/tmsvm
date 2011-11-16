@@ -12,11 +12,9 @@ elif find_library('liblinear'):
 	liblinear = CDLL(find_library('liblinear'))
 else:
 	if sys.platform == 'win32':
-		liblinear = CDLL(os.path.join(os.path.dirname(__file__),\
-				'liblinear.dll'))
+		liblinear = CDLL(os.path.join(os.path.dirname(__file__),'liblinear.dll'))
 	else:
-		liblinear = CDLL(os.path.join(os.path.dirname(__file__),\
-				 'liblinear.so.1'))
+		liblinear = CDLL(os.path.join(os.path.dirname(__file__),'liblinear.so.1'))
 
 # Construct constants
 SOLVER_TYPE = ['L2R_LR', 'L2R_L2LOSS_SVC_DUAL', 'L2R_L2LOSS_SVC', 'L2R_L1LOSS_SVC_DUAL',\
