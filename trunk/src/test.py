@@ -7,5 +7,7 @@ import grid_search_param
 import tms_svm
 import result_analysis
 
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
+import svm
 
 
