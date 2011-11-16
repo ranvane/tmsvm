@@ -9,9 +9,9 @@ if find_library('mmseg'):
     mmseg = CDLL(find_library('mmseg'))
 else:
     if sys.platform == 'win32':
-        mmseg = CDLL('./mmseg.dll')
+        mmseg = CDLL(os.path.join(os.path.dirname(__file__),"./mmseg.dll"))
     else:
-        mmseg = CDLL('./mmseg.so')    
+        mmseg = CDLL(os.path.join(os.path.dirname(__file__),"./mmseg.so"))    
 
     
 ##mmseg = cdll.LoadLibrary(ext)
