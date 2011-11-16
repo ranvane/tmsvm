@@ -14,6 +14,7 @@ import train_model
 import predict_model
 import grid_search_param
 import tms_svm
+import result_analysis
 
 def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm_param="",config_name="tms.config",dic_name="dic.key",model_name="tms.model",train_name="svm.train",svm_type="libsvm",param_name="svm.param",ratio=0.4,delete=True,str_splitTag="^",tc_splitTag="\t",seg=0,param_select=True,global_fun="one",local_fun="tf"):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。 然后使用最优的参数进行SVM分类，最后生成训练后的模型。
@@ -28,6 +29,7 @@ def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm
     stopword_filename 停用词的名称以及路径 ;默认不适用停用词
     svm_type :svm类型：libsvm 或liblinear 。默认为"libsvm"
     svm_param  用户自己设定的svm的参数,这个要区分libsvm与liblinear参数的限制。默认" " 
+    config_name:模型配置文件的名称，默认为"tms.config"
     dic_name 用户自定义词典名称;默认“dic.key”
     model_name用户自定义模型名称 ;默认"svm.model"
     train_name用户自定义训练样本名称 ；默认“svm.train”
@@ -92,12 +94,18 @@ def cons_train_sample_for_svm(filename,dic_path,sample_save_path="../svm.train",
     train_model.cons_train_sample_for_cla(filename, indexs, local_fun, dic_path, sample_save_path, delete, str_splitTag, tc_splitTag)
     
     
-def grid_param(problem_path, result_save_path="../svm.param", svm_type="libsvm", coarse_c_range=(-5,7,2), coarse_g_range=(3,-10,-2), fine_c_step=0.5, fine_g_step=0.5):
-    '''对SVM的参数进行搜索,如果是libsvm则搜索(c,gamma)，如果是liblinear则搜索(c)
+def tms_grid_param(problem_path, result_save_path="../svm.param", svm_type="libsvm", coarse_c_range=(-5,7,2), coarse_g_range=(3,-10,-2), fine_c_step=0.5, fine_g_step=0.5):
+    '''对SVM的参数进行搜索,如果是libsvm则搜索(c,gamma)，如果是liblinear则搜索(c)。当训练样本的容量大于3000时就会在粗粒度搜索时使用子集，子集的大小为[3000,5000]范围内。
+    当
     必须参数：
        problem_path：SVM输入格式文件的路径即名称。 
     可选参数:
        result_save_path:结果文件的保存路径:默认为"../svm.param"
+       svm_type :选择的SVM的类型，默认为libsvm
+       coarse_c_range ：粗粒度搜索时c搜索的范围，默认情况下为[-5,7],步长为2
+       coarse_g_range：粗粒度搜索时g搜索的范围，默认情况下为[3,-10]步长为-2
+       fine_c_step ：细粒度搜索时c的步长，默认情况下为0.5
+       fine_c_step ：细粒度搜索时c的步长，默认情况下为0.5
     '''
     if svm_type=="liblinear":
        coarse_g_range=(1,1,1)
@@ -106,7 +114,7 @@ def grid_param(problem_path, result_save_path="../svm.param", svm_type="libsvm",
     print "best c=%s ,g=%s"%(c,g)
     return c,g
 
-def ctm_train_model(problem_path,svm_type="libsvm",param="",model_save_path="../svm.model"):
+def tms_train_model(problem_path,svm_type="libsvm",param="",model_save_path="../svm.model"):
     '''训练模型程序。输入参数，可以训练libsvm与liblinear的模型。
     必须参数:
        problem_path :输入问题的路径即名称：
@@ -118,10 +126,61 @@ def ctm_train_model(problem_path,svm_type="libsvm",param="",model_save_path="../
     tms_svm.set_svm_type(svm_type)
     train_model.ctm_train_model(problem_path, param, model_save_path)
     
-def tms_predict(filename,dic_path,model_path,indexes=[1],result_save_path="../tms.result",result_indexes=[0],str_splitTag="^",tc_splitTag="\t",seg=0,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
-    '''模型预测程序.'''
-    predict_model.ctm_predict(filename, indexes, dic_path, result_save_path, result_indexes, model_path, str_splitTag, tc_splitTag, seg, delete, change_decode, in_decode, out_encode)
-    
-def ctm_predict_multi(filename,dic_path_list,model_path_list,indexes_lists,result_save_path="../tms.result",result_indexes=[0],str_splitTag="^",tc_splitTag="\t",seg=0,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
-    predict_model.ctm_predict_multi(filename, indexes_lists, dic_path_list, result_save_path, result_indexes, model_path_list, str_splitTag, tc_splitTag, delete, change_decode, in_decode, out_encode)
-    
+def tms_predict(filename,config_file,result_save_path="../tms.result",indexes=[1],result_indexes=[0],str_splitTag="^",tc_splitTag="\t",seg=0,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
+    '''模型预测程序.输入需要预测的文件，以及模型的配置文件，既可利用已经训练好的模型对文件进行预测。
+    必须参数：
+        filename：
+    '''
+    predict_model.ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK")
+
+def tms_predict_multi(filename,config_files,indexes_lists,result_save_path="../tms.result",result_indexes=[0],str_splitTag="^",tc_splitTag="\t",seg=0,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
+    predict_model.ctm_predict_multi(filename, config_files, indexes_lists, result_save_path, result_indexes, str_splitTag, tc_splitTag, seg, delete, change_decode, in_decode, out_encode)
+
+def tms_analysis(filename,output_file="",indexes=[0,1,2],step=1,predicted_label_index=0,predicted_value_index=1,true_label_index=2,threshold=0.0,label=1,min=0,max=1):
+    '''function 是值要选择进行分析的函数，其中1为cal_multi_rate（多类别模型的分类准确率）；2为cal_f（）'''
+    ""
+    "cal_f"
+    "cal_f_binary"
+    output=False
+    if len(output_file)>1:
+        output=True
+        f = file(output_file,'w')
+    min = min*10
+    max = max*10
+    X = result_analysis.read_result(filename,indexes)
+    if step==1:
+        rate,micro,macro = result_analysis.cal_rate([y[true_label_index] for y in X ],[y[predicted_label_index] for y in X ])
+        if output==False:
+            print "micro = %g,macro = %g" %(micro,macro)
+            print rate
+        else:
+            f.write("micro = %g,macro = %g\n" %(micro,macro))
+            f.write("各个类别的分类准确率")
+            result_analysis.save_result(f,rate)
+            
+    if step==2:
+        rate  = result_analysis.cal_f([y[true_label_index] for y in X ],[y[predicted_label_index] for y in X ])
+        if output==False:
+            print rate
+        else:
+            f.write("各个类别的F值、召回率、准确率")
+            result_analysis.save_result(f,rate)
+
+    if step==3:
+        rate  = result_analysis.cal_f_by_threshold([y[true_label_index] for y in X ],[y[predicted_label_index] for y in X ],[y[predicted_value_index] for y in X],label,threshold)
+        if output==False:
+            print rate
+        else:
+            f.write("对特定类别的F值、召回率、准确率")
+            result_analysis.save_result(f,rate)
+            
+    if step==4:
+        rate = result_analysis.threshlod_anlysis([y[true_label_index] for y in X ],[y[predicted_label_index] for y in X ],[y[predicted_value_index] for y in X],first_range=[i/10.0 for i in range(min,max)])
+        if output==False:
+            print rate
+        else:
+            f.write("所有类别各个阈值下得F值、召回率、准确率")
+            result_analysis.save_result(f,rate)
+        
+    if output ==True:
+        f.close()

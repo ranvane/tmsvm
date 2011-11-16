@@ -15,22 +15,23 @@ def binary(x):
 
 def local_f(fun_type):
     if type(fun_type)==types.StringType:
-        if type=="tf":
+        if fun_type=="tf":
             return tf
-        if type =="logtf":
+        if fun_type =="logtf":
             return logtf
-        if type=="binary":
+        if fun_type=="binary":
             return binary
     if type(fun_type)==types.FunctionType:
         return fun_type
     
 def global_f(fun_type):
+    fun_type = fun_type.strip()
     if type(fun_type)==types.StringType:
-        if type=="one":
+        if fun_type=="one":
             return one
-        if type=="idf":
+        if fun_type=="idf":
             return idf
-        if type=="rf":
+        if fun_type=="rf":
             return rf
     if type(fun_type)==types.FunctionType:
         return fun_type

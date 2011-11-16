@@ -123,7 +123,7 @@ def grid_search_for_large_data(y,x,fw,coarse_c_trupele,coarse_g_trupele,fine_c_s
     sub_x=[]
     l = len(y)
     
-    #子集的大小应该是根据原训练样本的大小来决定的，其容量应该初步设定为原训练样本的40%，且不超过5000，不低于2000。如果总样本的容量本来就小于2000，则就不用再选子集了。
+    #子集的大小应该是根据原训练样本的大小来决定的，其容量应该初步设定为原训练样本的40%，且不超过5000，不低于3000。如果总样本的容量本来就小于2000，则就不用再选子集了。
     subset_num=min(5000,max(min(3000,len(y)),int(len(y)*0.4)))
     sub_y,sub_x=subset(y,x,subset_num)
     

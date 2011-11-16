@@ -5,8 +5,8 @@
 '''此处封装了libsvm与liblinear'''
 import sys
 import os
-depend_path = os.path.dirname(os.getcwd())+"/dependence"
-sys.path.insert(0,depend_path)
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
+
 
 import svm
 import svmutil
