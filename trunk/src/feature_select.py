@@ -60,7 +60,7 @@ def cons_dic(filename,indexes,stop_words_dic,str_splitTag,tc_splitTag):
                 continue
             if dic.has_key(term) is True:
                 if dic[term].has_key(label):
-                    dic[term][label]+=1
+                    dic[term][label]=1
                 else:
                     dic[term][label]=1
             else:
