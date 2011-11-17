@@ -33,6 +33,8 @@ def global_f(fun_type):
             return idf
         if fun_type=="rf":
             return rf
+        if fun_type=="chi":
+            return chi
     if type(fun_type)==types.FunctionType:
         return fun_type
     
@@ -71,3 +73,22 @@ def one(dic,cat_num_dic,rows):
         global_weight[key] = 1
     return global_weight
 
+def chi(dic,cat_num_dic,rows):
+    '''利用卡方公式计算每个term的分值'''
+    term_score=dict()
+    for term in dic.keys():
+        term =term.strip()
+        all_num_term = float(sum(dic[term].values()))
+        all_num_cat = float(sum(cat_num_dic.values()))
+        chi_score= 0.0
+        for cat in cat_num_dic.keys():
+            A  =  float(dic[term][cat])
+            B = float(all_num_term-A)
+            C= float(cat_num_dic[cat]-A)
+            D = float(all_num_cat-all_num_term-cat_num_dic[cat]+A) #既不包含term也不在该类中。
+            if (A+C)*(B+D)*(A+B)*(C+D) ==0:
+                chi_score=0
+            else:
+                chi_score = max(chi_score,rows*math.pow(A*D-B*C,2)/((A+C)*(B+D)*(A+B)*(C+D)))
+        term_score[term]=chi_score
+    return term_score

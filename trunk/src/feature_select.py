@@ -10,7 +10,6 @@ import pickle
 import measure
 from fileutil import read_dic
 
-
 def feature_select(filename,indexes,global_fun,dic_save_path,ratio,stop_words_dic,str_splitTag,tc_splitTag):
     '''特征选择的主函数，输入的训练样本，内容的index，特征选择后的词典保存的路径及名称，卡方选择的比例默认为40%.
     最终会选择top $ratio 的作为最终的词典。
@@ -23,7 +22,7 @@ def feature_select(filename,indexes,global_fun,dic_save_path,ratio,stop_words_di
 
 def cons_dic(filename,indexes,stop_words_dic,str_splitTag,tc_splitTag):
     '''构造词典，主要是为了计算卡方的特征值。
-       词典的形式：{term:{label:tf}}
+       词典的形式：{term:{label:n(term)}} 每个term对应的是一个词典，其中词典中存储了每个类别中包含该term 的样本数。
        label 为int型
     '''
     dic =dict() #词典
@@ -51,21 +50,25 @@ def cons_dic(filename,indexes,stop_words_dic,str_splitTag,tc_splitTag):
         if len(indexes)>1:
             for i  in range(1,len(indexes)):
                 string += str_splitTag+sample[indexes[i]]
-               
+        #计算包含term的样本数      
+        temp_dic = dict() 
         for term in string.strip().split(str_splitTag):
             if len(term.strip())==0:
                 continue
             term = term.strip()
             if stop_words_dic.has_key(term) is True:
                 continue
-            if dic.has_key(term) is True:
-                if dic[term].has_key(label):
-                    dic[term][label]=1
+            temp_dic[term]=1.0 #只要出现一次就代表着该样本包含该词。
+            
+        for key in temp_dic.keys():
+            if dic.has_key(key) is True:
+                if dic[key].has_key(label):
+                    dic[key][label]+=1.0
                 else:
-                    dic[term][label]=1
+                    dic[key][label]=1
             else:
-                dic[term]={}
-                dic[term][label]=1
+                dic[key]={}
+                dic[key][label]=1
     for key in dic.keys():
         for cat in cat_num_dic.keys():
             if dic[key].has_key(cat) is False:
@@ -85,7 +88,7 @@ def chi_max_score(dic,cat_num_dic,rows):
             A  =  float(dic[term][cat])
             B = float(all_num_term-A)
             C= float(cat_num_dic[cat]-A)
-            D = float(all_num_cat-B)
+            D = float(all_num_cat-all_num_term-cat_num_dic[cat]+A) #既不包含term也不在该类中。
             if (A+C)*(B+D)*(A+B)*(C+D) ==0:
                 chi_score=0
             else:
@@ -130,6 +133,8 @@ def save_dic(dic,save_path):
     
 def load_dic(load_path):
     return pickle.load(open(load_path,'r'))
+
+#feature_select("../data/test.txt",[1],"chi","../data/test.key",1.0,dict(),"^","\t")
 
 #def main():
 #    filename = "D:/张知临/源代码/python_ctm/model/im_info/trainset(4000).train"
