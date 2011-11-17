@@ -116,7 +116,7 @@ def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_para
     f.write("WordSeg:"+str(seg).strip()+"\n")
     f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.gmtime()))
 
-def ctm_feature_select(filename,indexs,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
+def ctm_feature_select(filename,indexes,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
     #如果模型文件保存的路径不存在，则创建该文件夹
     dic_path= main_save_path+"model/"+dic_name
     if os.path.exists(main_save_path):
@@ -127,7 +127,7 @@ def ctm_feature_select(filename,indexs,global_fun,main_save_path,dic_name,ratio,
         stop_words_dic=dict()
     else:
         stop_words_dic = fileutil.read_dic(stopword_filename)
-    feature_select(filename,indexs,global_fun,dic_path,ratio,stop_words_dic,str_splitTag,tc_splitTag)
+    feature_select(filename,indexes,global_fun,dic_path,ratio,stop_words_dic,str_splitTag,tc_splitTag)
 
 def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_path,delete,str_splitTag,tc_splitTag):
     '''根据提供的词典，将指定文件中的指定位置上的内容构造成SVM所需的问题格式，并进行保存'''

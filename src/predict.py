@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #_*_ coding: utf-8 _*_
 #author: 张知临 zhzhl202@163.com
-from predict_model import *
+import predict_model 
 from optparse import *
 import os 
 
@@ -9,7 +9,7 @@ def list_callback(option,opt,value,parser):
     setattr(parser.values,option.dest,value.split(','))
 
 def main():
-    usage="usage: %prog [options] filename dic_path model_path version= %prog 1.0"
+    usage="usage: %prog [options] filename config_path version= %prog 1.0"
     parser = OptionParser(usage=usage)
     parser.add_option("-i","--indexes",dest="indexes",action="callback",type="string",default=[0],callback=list_callback)
     parser.add_option("-r","--result_indexes",dest="result_indexes",action="callback",type="string",default=[0],callback=list_callback,help="specify the content indexes that output with the predicted score")
@@ -30,8 +30,8 @@ def main():
 #            result_save_path = options.save_main_path+"result/score.result"
 #        else: result_save_path =os.getcwd()+"/score.result"
     filename = args[0]
-    dic_path = args[1]
-    model_path = args[2]
-    ctm_predict(args[0],indexes,dic_path,options.result_save,result_indexes,model_path,options.str_splitTag,options.tc_splitTag,seg)
+    config_path = args[1]
+    predict_model.ctm_predict(args[0], config_path, indexes, options.result_save, result_indexes, options.str_splitTag,options.tc_splitTag,options.segment)
+
 if __name__ =="__main__":
     main()

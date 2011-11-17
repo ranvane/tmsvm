@@ -59,7 +59,7 @@ def tms_segment(filename,indexes=[1],out_filename="",str_splitTag="^",tc_splitTa
     train_model.file_seg(filename, indexes, out_filename, str_splitTag, tc_splitTag, seg)
     
    
-def tms_feature_select(filename,indexs=[1],global_fun="one",main_save_path="../",dic_name="dic.key",ratio=0.4,stopword_filename="",str_splitTag="^",tc_splitTag="\t"):
+def tms_feature_select(filename,indexes=[1],global_fun="one",main_save_path="../",dic_name="dic.key",ratio=0.4,stopword_filename="",str_splitTag="^",tc_splitTag="\t"):
     '''特征选择的主程序，输入指定的文件，会自动生成词典，并根据卡方公式进行特征选择。
     必须参数：
         filename 训练文本所在的文件名，默认情况下，已经分好词。
@@ -75,7 +75,7 @@ def tms_feature_select(filename,indexs=[1],global_fun="one",main_save_path="../"
     tc_splitTag训练样本中各个字段分割所用的符号 ，默认"\t"
     global_fun :全局权重的计算方式：有"one","idf","rf" ,默认为"one"
     '''
-    train_model.ctm_feature_select(filename, indexs, global_fun, main_save_path, dic_name, ratio, stopword_filename, str_splitTag, tc_splitTag)
+    train_model.ctm_feature_select(filename, indexes, global_fun, main_save_path, dic_name, ratio, stopword_filename, str_splitTag, tc_splitTag)
 
 
 def cons_train_sample_for_svm(filename,dic_path,sample_save_path="../svm.train",indexs=[1],local_fun="tf",delete=True,str_splitTag="^",tc_splitTag="\t"):

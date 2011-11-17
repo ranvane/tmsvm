@@ -41,6 +41,9 @@ def idf(dic,cat_num_dic,rows):
     global_weight =dict()
     for key in dic.keys():
         n = sum(dic[key].values())
+        a = math.log(float(rows)/(n+1.0))
+        if a<0:
+            print "hello"
         global_weight[key] = math.log(float(rows)/(n+1.0))
     return global_weight
 
