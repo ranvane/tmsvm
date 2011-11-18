@@ -40,8 +40,8 @@ def tms_train(filename,indexes=[1],main_save_path="../",stopword_filename="",svm
     tc_splitTag训练样本中各个字段分割所用的符号 ，默认"\t"
     seg 分词的选择：0为不进行分词；1为使用mmseg分词；2为使用aliws分词，默认为0
     param_select ;是否进行SVM模型参数的搜索。True即为使用SVM模型grid.搜索，False即为不使用参数搜索。默认为True
-    local_fun：即对特征向量计算特征权重时需要设定的计算方式:x(i,j) = local(i,j)*global(i).可选的有tf。默认为"tf"
-    global_fun :全局权重的计算方式：有"one","idf","rf" ,默认为"one"
+    local_fun：即对特征向量计算特征权重时需要设定的计算方式:x(i,j) = local(i,j)*global(i).可选的有tf,binary,logtf。默认为"tf"
+    global_fun :全局权重的计算方式：有"one","idf","rf","chi" ,默认为"one"
     '''
     train_model.ctm_train(filename, indexes, main_save_path, stopword_filename, svm_param, config_name, dic_name, model_name, train_name, svm_type, param_name, ratio, delete, str_splitTag, tc_splitTag, seg, param_select, global_fun, local_fun)
 
@@ -129,7 +129,13 @@ def tms_train_model(problem_path,svm_type="libsvm",param="",model_save_path="../
 def tms_predict(filename,config_file,result_save_path="../tms.result",indexes=[1],result_indexes=[0],str_splitTag="^",tc_splitTag="\t",seg=0,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''模型预测程序.输入需要预测的文件，以及模型的配置文件，既可利用已经训练好的模型对文件进行预测。
     必须参数：
-        filename：
+        filename：带预测文件的路径以及名称
+        config_file:已经训练好的模型的配置文件
+    可选参数：
+       result_save_path：预测结果保存路径及名称。默认为"../tms.result"
+       indexes:预测文件中需要预测的字段。默认为[1]
+       result_indexes:需要和预测结果一起输出的源文件中的字段。默认为[0]
+       str_splitTag:
     '''
     predict_model.ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK")
 
