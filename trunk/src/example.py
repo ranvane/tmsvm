@@ -33,6 +33,7 @@ tms.cons_train_sample_for_svm("../data/binary_seged.train", "../data/model/dic.k
 
 '''假设data文件夹下有一个post.train和post.test的训练样本和测试样本，每一行有3个字段：label title content。样本都没有分词
 该例子需要完成：
-1、对title进行分词、训练，模型保存在../data/post/ 下，所有的文件都有title命名，SVM模型选择使用libsvm，
-2、对content进行分词、训练，模型保存在../data/post/ 下，所有的文件都有content命名，SVM模型选择使用liblinear，
+1、对title进行分词、训练，模型保存在../data/post/ 下，所有的文件都有title命名，SVM模型选择使用libsvm，核函数使用rbf
+2、对content进行分词、训练，模型保存在../data/post/ 下，所有的文件都有content命名，SVM模型选择使用liblinear
 '''
+tms.tms_train("../data/post.train",index=[1],)
