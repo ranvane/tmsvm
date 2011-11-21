@@ -14,11 +14,11 @@ import measure
 import ctmutil 
 import types
 from feature_select import feature_select
-from grid_search_param import grid
+import grid_search_param 
 import os
 import time
 
-def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config_name,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun):
+def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config_name,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun,label_file):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
     然后使用最优的参数进行SVM分类，最后生成训练后的模型。
     需要保存的文件：（需定义一个主保存路径）
@@ -42,9 +42,10 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
     param_select ;是否进行SVM模型参数的搜索。True即为使用SVM模型grid.搜索，False即为不使用参数搜索。
     local_fun：即对特征向量计算特征权重时需要设定的计算方式:x(i,j) = local(i,j)*global(i).可选的有tf,logtf
     global_fun :全局权重的计算方式：有"one","idf","rf"
+    label_file:类标签的解释说明文件。
     '''
 
-    print "创建模型文件保存的路径"
+    print "-----------------创建模型文件保存的路径-----------------"
     if os.path.exists(main_save_path):
         if os.path.exists(os.path.join(main_save_path,"model")) is False:
             os.makedirs(os.path.join(main_save_path,"model"))
@@ -86,26 +87,26 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
            coarse_g_range=(3,-10,-2)
            fine_c_step=0.5
            fine_g_step=0.5
-           c,g=grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
+           c,g=grid_search_param.grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
            svm_param = svm_param + " -c "+str(c)+" -g "+str(g)
         if svm_type=="liblinear":
            coarse_c_range=(-5,7,2)
            coarse_g_range=(1,1,1)
            fine_c_step=0.5
            fine_g_step=0
-           c,g=grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
+           c,g=grid_search_param.grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
            svm_param = svm_param + " -c "+str(c)
     
     print "-----------------训练模型，并将模型进行保存----------"
     model_save_path  = main_save_path+"model/"+model_name
     ctm_train_model(problem_save_path,svm_type,svm_param,model_save_path)
     
-    print "保存模型配置"
+    print "-----------------保存模型配置-----------------"
     f_config = file(os.path.join(main_save_path,"model",config_name),'w')
-    save_config(f_config,dic_name,model_name,local_fun_str,global_fun,seg,svm_type,svm_param)
+    save_config(f_config,dic_name,model_name,local_fun_str,global_fun,seg,svm_type,svm_param,label_file)
     f_config.close()
 
-def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param):
+def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param,label_file):
     '''保存模型配置文件'''
     f.write("SvmType:"+str(svm_type).strip()+"\n")
     f.write("SvmParam:"+str(svm_param).strip()+"\n")
@@ -114,7 +115,12 @@ def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_para
     f.write("LocalFun:"+str(local_fun).strip()+"\n")
     f.write("GlobalFun:"+str(global_fun).strip()+"\n")
     f.write("WordSeg:"+str(seg).strip()+"\n")
-    f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.gmtime()))
+    f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.gmtime())+"\n")
+    f.write("Labels:\n{\n") #将类标签写入，类标签会以"label,descr"进行存储
+    if label_file.strip()!="":
+        for line in file(label_file):
+            f.write(line+"\n")
+    f.write("}\n")
 
 def ctm_feature_select(filename,indexes,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
     #如果模型文件保存的路径不存在，则创建该文件夹

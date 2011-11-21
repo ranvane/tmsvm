@@ -138,6 +138,28 @@ def save_result(f,rate_dic,count=0):
             f.write("\t"*count)
             f.write(str(rate_dic)+"\t")
 
+def print_result(rate_dic,count=0):
+    '''将结果词典写入到已经打开的文件中。
+    系统将探测变量类型。此处为了保证写入的格式好看，利用了递归程序。
+    每一级会记录上一级所
+    '''
+    if type(rate_dic)==types.DictType:
+        print "\t"
+        temp=count
+        for key in sorted(rate_dic.keys()):
+            print "\n"
+            print "\t"*temp+str(key)
+            count=temp
+            count+=1
+            print_result(rate_dic[key],count)     
+    else:
+        if type(rate_dic) in(types.ListType,types.TupleType):
+            print "\t"*count
+            for value in rate_dic:
+                print str(value)+"\t"      
+        else:
+            print "\t"*count
+            print str(rate_dic)+"\t"
 
 def do_statis(f,original_res,new_sc,text,second_range):
     f.write("--------------------------"+str(text)+"------------------------------"+"\n")
