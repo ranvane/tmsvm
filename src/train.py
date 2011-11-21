@@ -35,7 +35,7 @@ def main():
     parser.add_option("-c","--param_select",action="store_false",dest="param_select",default=True)
     parser.add_option("-g","--global_fun",dest="global_fun",default="one",type="choice",choices=["one","idf","rf"])
     parser.add_option("-l","--local_fun",dest="local_fun",default="tf",type="choice",choices=["tf"])
-
+    parser.add_option("-b","--label_file",dest="label_file",type="string",default="")
     options, args = parser.parse_args() 
     if options.indexes:
         indexes = [int(i) for i in options.indexes]
@@ -50,7 +50,7 @@ def main():
     if options.svm_param:
         svm_param = options.svm_param.replace("'","") 
     if step==1:
-        train_model.ctm_train(args[0],indexes,options.save_main_path,stopword_filename,config_name=options.config_name,svm_type =options.svm_type,segment=options.segment,param_select=options.param_select,global_fun=options.global_fun,local_fun=options.local_fun,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
+        train_model.ctm_train(args[0],indexes,options.save_main_path,stopword_filename,config_name=options.config_name,svm_type =options.svm_type,segment=options.segment,param_select=options.param_select,global_fun=options.global_fun,local_fun=options.local_fun,svm_param=svm_param,dic_name=options.dic_name,model_name=options.model_name,train_name=options.train_name,param_name=options.param_name,ratio=options.ratio,delete=True,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag,label_file=options.label_file)
     if step==2:
         train_model.ctm_feature_select(args[0],indexes,options.global_fun,options.save_main_path,options.dic_name,options.ratio,stopword_filename,str_splitTag=options.str_splitTag,tc_splitTag=options.tc_splitTag)
     

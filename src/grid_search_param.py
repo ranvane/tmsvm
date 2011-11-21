@@ -98,7 +98,7 @@ def grid_search(y,x,fw,c_range,g_range):
     fw.write("下面是各种组合得到的交叉验证的效果：\n")
     for (c1,g1) in job:
         c,g=2**c1,2**g1
-        param="-v 4 "
+        param="-v 5 "
         if len(c_range)>2:
             param+=" -c "+str(c)
         if len(g_range)>2:

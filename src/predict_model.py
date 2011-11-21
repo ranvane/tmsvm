@@ -105,6 +105,7 @@ def ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str
         filename = segment_file
     f= file(filename,'r')
     fs = file(result_save_path,'w')
+    print "-----------------正在对样本进行预测-------------------"
     for line in f.readlines():
         if change_decode ==True:
             line = line.decode(in_decode).encode(out_encode,'ignore')
@@ -121,6 +122,7 @@ def ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str
         fs.write("\n")
     f.close()
     fs.close()
+    print "-----------------预测完毕-------------------"
 
 def ctm_predict_multi(filename,config_files,indexes_lists,result_save_path,result_indexes,str_splitTag,tc_splitTag,seg,delete=False,change_decode=False,in_decode="UTF-8",out_encode="GBK"):
     '''多个模型的预测，如一个文本有多个模型需要预测
@@ -148,6 +150,7 @@ def ctm_predict_multi(filename,config_files,indexes_lists,result_save_path,resul
         
     f= file(filename,'r')
     fs = file(result_save_path,'w')    
+    print "-----------------正在对样本进行预测-------------------"
     for line in f.readlines():
         if change_decode ==True:
             line = line.decode(in_decode).encode(out_encode,'ignore')
@@ -178,5 +181,5 @@ def ctm_predict_multi(filename,config_files,indexes_lists,result_save_path,resul
         fs.write("\n")
     f.close()
     fs.close()
-    
+    print "-----------------预测完毕-------------------"
 #ctm_predict_multi("../model/binary.test",[[1],[1]],["../model/dic.key","../model/dic.key"],result_save_path,result_indexes,model_path_list,str_splitTag,tc_splitTag)
