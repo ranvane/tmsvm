@@ -14,4 +14,32 @@
  # 如果想使用LSA部分，请把必备的scipy和numpy安装上，见[install_Scipy_Numpy_on_Ubuntu]，如果不适用可以跳过这一步
  # OK，这些操作完成以后，就可以按照你的程序要求修改程序或者是使用，Good Luck。
 
+==调用示例==
+该系统可以在命令行（Linux或cmd中）中直接使用，也可以在程序通过直接调用源程序使用。
+在程序中使用。
+{{{
+import tms
+
+//对data文件夹下的binary_seged.train文件进行训练。
+tms.tms_train(“../data/binary_seged.train”) 
+
+//利用已经训练好的模型，对对data文件夹下的binary_seged.test文件预测
+tms.tms_predict(“../data/binary_seged.test”,”../model/tms.config”)
+
+//对预测的结果进行分析，评判模型的效果
+tms. tms_analysis(“../tms.result”)
+}}}
+在命令行中调用
+{{{
+//对data文件夹下的binary_seged.train文件进行训练。
+$python auto_train.py [options]  ../data/binary_seged.train
+
+//利用已经训练好的模型，对对data文件夹下的binary_seged.test文件预测
+$python predict.py ../data/binary_seged.train ../model/tms.config
+
+//对预测的结果进行分析，评判模型的效果
+$python result_anlaysis.py ../tms.result
+}}}
+上面的调用形式都是使用系统中默认的参数，更具体、灵活的参数见程序调用接口
+
 有问题或者是建议，请联系 zhzhl202@163.com
