@@ -12,6 +12,7 @@ import svm
 import svmutil
 import liblinear
 import liblinearutil 
+import math
 
 read_problem = lambda x:x
 train =  lambda x:x
@@ -48,6 +49,47 @@ def detect_svm_type(model):
             svm_type="liblinear"
             break
     return svm_type
+
+def classer_value(values):
+    '''计算类得隶属度,libsvm采用的为one-against-one算法。
+    liblinear采用的为oen-against-rest算法。因此在计算最终的隶属度分数上有所区别.
+    计算公式为：sum(vi)/(2*k)+k/(2*n):n为所有参数类得总数,对libsvm为all-1,liblinear为1，k为支持该类的数,vi为支持该类的value
+    '''
+    
+    if svm_type=="libsvm":
+        n = 1+int(math.sqrt(2*len(values)+1))
+        size = n-1
+        vote=[0]*n
+        score=[0]*n
+        p=0
+        for i in range(n-1):
+            for j in range(i+1,n):
+                if values[p]>0:
+                    vote[i]+=1
+                    score[i]+=math.fabs(values[p])
+                else : 
+                    vote[j]+=1
+                    score[j]+=math.fabs(values[p])
+                p+=1
+        max = 0 
+        for i in range(1,n):
+            if vote[i]>vote[max]:
+                max = i
+        k = vote[max]
+        init_score=score[max]
+    if svm_type=="liblinear":
+        n =len(values)
+        max = 0
+        for i in range(1,n-1):
+            if values[i]>values[max]:
+                max = i
+        size = 1
+        k = 1
+        init_score = values[max]
+    return float(init_score)/(2.0*k)+float(k)/(2.0*size) 
+
+
+    
             
 
 

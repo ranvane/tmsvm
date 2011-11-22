@@ -32,49 +32,7 @@ def cal_sc_optim(lab,m,text,dic_list,local_fun,global_weight,str_splitTag):
     y,x = ctmutil.cons_pro_for_svm(lab,text.strip().split(str_splitTag),dic_list,local_fun,global_weight)
     p_lab,p_acc,p_sc=tms_svm.predict(y,x,m)  
     #在这里要判定是二分类还是多分类，如果为二分类，返回相应的分数，如果为多分类，则返回预测的标签。
- 
-    return p_lab[0],sum_pre_value(p_sc[0])
-  
-
-def sum_pre_value(values):
-    '''返回具有最大投票数的标签所获得分数的总和'''
-    size = len(values)
-    k = 1+int(math.sqrt(2*size+1))
-    vote=[0]*k
-    score=[0]*k
-    p=0
-    for i in range(k):
-        for j in range(i+1,k):
-            if values[p]>0:
-                vote[i]+=1
-                score[i]+=math.fabs(values[p])
-            else : 
-                vote[j]+=1
-                score[j]+=math.fabs(values[p])
-            p+=1
-    max = 0 
-    for i in range(1,k):
-        if vote[i]>vote[max]:
-            max = i
-    return score[max]
-
-def number_pre_value(values):
-    '''返回具有最大投票数的标签所获得支持分数的个数'''
-    size = len(values)
-    k = 1+int(math.sqrt(2*size+1))
-    vote=[0]*k
-    p=0
-    for i in range(k):
-        for j in range(i+1,k):
-            if values[p]>0:
-                vote[i]+=1
-            else : vote[j]+=1
-            p+=1
-    max = 0 
-    for i in range(k):
-        if vote[i]>max:
-            max = vote[i]
-    return max
+    return p_lab[0],tms_svm.classer_value(p_sc[0])
 
 def load_tms_model(config_file):
     '''通过模型配置文件加载词典、全局因子、局部因子、SVM模型'''
