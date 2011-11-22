@@ -77,7 +77,7 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
     problem_save_path  = os.path.join(main_save_path,"temp",train_name)
     local_fun_str = local_fun
     local_fun = measure.local_f(local_fun)
-    cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
+    label = cons_train_sample_for_cla(filename,indexes,local_fun,dic_path,problem_save_path,delete,str_splitTag,tc_splitTag)
     
     if param_select ==True:
         print"--------------------选择最优的c,g------------------------------"
@@ -103,10 +103,10 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
     
     print "-----------------保存模型配置-----------------"
     f_config = file(os.path.join(main_save_path,"model",config_name),'w')
-    save_config(f_config,dic_name,model_name,local_fun_str,global_fun,seg,svm_type,svm_param,label_file)
+    save_config(f_config,dic_name,model_name,local_fun_str,global_fun,seg,svm_type,svm_param,label_file,label)
     f_config.close()
 
-def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param,label_file):
+def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_param,label_file,label):
     '''保存模型配置文件'''
     f.write("SvmType:"+str(svm_type).strip()+"\n")
     f.write("SvmParam:"+str(svm_param).strip()+"\n")
@@ -120,6 +120,9 @@ def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_para
     if label_file.strip()!="":
         for line in file(label_file):
             f.write(line+"\n")
+    else :
+        for l in label:
+            f.write(str(int(l))+",\n")
     f.write("}\n")
 
 def ctm_feature_select(filename,indexes,global_fun,main_save_path,dic_name,ratio,stopword_filename,str_splitTag,tc_splitTag):
@@ -140,7 +143,7 @@ def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_pat
     dic_list,global_weight = fileutil.read_dic_ex(dic_path,dtype=str)
     if type(local_fun)==types.StringType:
         local_fun = measure.local_f(local_fun)
-
+    label = set()
     f= file(filename,'r')
     fs = file(sample_save_path,'w')
     for line in f.readlines():
@@ -154,8 +157,10 @@ def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_pat
         if delete == True and len(x[0])==0:
             continue
         save_dic_train_sample(fs,y,x)
+        label.add(y[0])
     f.close()
     fs.close()
+    return label
 
 def extract_im_feature(filename,content_indexs,feature_indexs,dic_path,svm_model,delete,str_splitTag,tc_splitTag):
     ''''''
