@@ -55,11 +55,11 @@ def rf(dic,cat_num_dic,rows):
     for term in dic.keys():
         term =term.strip()
         rf_score= 0.0
+        all_num_term = float(sum(dic[term].values()))
         for cat in cat_num_dic.keys():
             A  =  float(dic[term][cat]) #既在该类也包含该term
             C = float(all_num_term-A) # 不在该类但包含该term
-            else:
-                rf_score = max(rf_score,math.log(2+A/max(1,C)))
+	    rf_score = max(rf_score,math.log(2+A/max(1,C)))
         global_weight[term] = rf_score
     return global_weight
 
@@ -81,7 +81,7 @@ def chi(dic,cat_num_dic,rows):
         chi_score= 0.0
         for cat in cat_num_dic.keys():
             A  =  float(dic[term][cat]) #既在该类也包含该term
-			B= float(cat_num_dic[cat]-A) #在该类中但不包含该term
+            B= float(cat_num_dic[cat]-A) #在该类中但不包含该term
             C = float(all_num_term-A) # 不在该类但包含该term
             D = float(all_num_cat-all_num_term-cat_num_dic[cat]+A) #既不包含term也不在该类中。
             if (A+C)*(B+D)*(A+B)*(C+D) ==0:

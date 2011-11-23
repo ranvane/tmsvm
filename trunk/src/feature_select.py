@@ -86,7 +86,7 @@ def chi_max_score(dic,cat_num_dic,rows):
         chi_score= 0.0
         for cat in cat_num_dic.keys():
             A  =  float(dic[term][cat]) #既在该类也包含该term
-			B= float(cat_num_dic[cat]-A) #在该类中但不包含该term
+            B= float(cat_num_dic[cat]-A) #在该类中但不包含该term
             C = float(all_num_term-A) # 不在该类但包含该term
             D = float(all_num_cat-all_num_term-cat_num_dic[cat]+A) #既不包含term也不在该类中。
             if (A+C)*(B+D)*(A+B)*(C+D) ==0:
