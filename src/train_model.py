@@ -89,7 +89,7 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
            fine_g_step=0.5
            c,g=grid_search_param.grid(problem_save_path,search_result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step)
            svm_param = svm_param + " -c "+str(c)+" -g "+str(g)
-        if svm_type=="liblinear":
+        if svm_type=="liblinear" or (svm_type=="libsvm" and is_linear_kernal(svm_param) is True):
            coarse_c_range=(-5,7,2)
            coarse_g_range=(1,1,1)
            fine_c_step=0.5
@@ -194,6 +194,17 @@ def save_dic_train_sample(f,y,x):
             f.write("\t"+str(key)+":"+str(x[i][key]))
         f.write("\n")
 
+def is_linear_kernal(svm_param):
+		'''判断参数中是否包含线性核函数'''
+		index = svm_param.find("-t")
+		if index<0:
+			return False
+		for i in  range(index+2,len(svm_param)):
+			if svm_param[i]!=' ' and svm_param[i]!='0':
+				return False
+			if svm_param[i]=='0':
+				return True
+		return False
 
 def save_list_train_sample(f,lab,vec):
     '''将特征向量以SVM的输入格式进行保存，
