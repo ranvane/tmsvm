@@ -6,7 +6,6 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
 
-
 import pymmseg as seg
 
 seg.dict_load_defaults()
