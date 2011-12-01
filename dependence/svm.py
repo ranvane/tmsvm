@@ -12,9 +12,9 @@ elif find_library('libsvm'):
 	libsvm = CDLL(find_library('libsvm'))
 else:
 	if sys.platform == 'win32':
-		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"libsvm.dll"))
+		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"./libsvm.dll"))
 	else:
-		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"libsvm.so.64"))
+		libsvm = CDLL(os.path.join(os.path.dirname(__file__),"./libsvm.so.64"))
 print 
 
 # Construct constants
