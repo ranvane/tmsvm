@@ -1,13 +1,2 @@
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"tools"))
-import train_model
-import predict_model
-import grid_search_param
-import tms_svm
-import result_analysis
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
-import svm
-
-
+import tms
+tms.tms_predict_multi("../data/weijin.test", ["../data/aliws/model/lineartitle.config","../data/aliws/model/lineartitle_content.config","../data/aliws/model/svmtitle.config","../data/aliws/model/svmtitle_content.config"],[[2],[2,3],[2],[2,3]],result_indexes=[0,1,2,3,4],result_save_path="../data/weijin.result")

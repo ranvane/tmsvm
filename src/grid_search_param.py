@@ -7,6 +7,7 @@
 import tms_svm
 from random import randint
 import math
+import time
 
 def grid(problem_path,result_save_path,svm_type,coarse_c_range,coarse_g_range,fine_c_step,fine_g_step):
     '''搜索的主文件;
@@ -107,6 +108,7 @@ def grid_search(y,x,fw,c_range,g_range):
         if (c < best_c and rate > best_rate-esp ) or (c > best_c and rate-esp > best_rate) or (c== best_c and rate > best_rate) or (abs(rate-best_rate)<esp and g==best_g and c<best_c):
             best_rate = rate
             best_c,best_g=c,g
+        fw.write(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))+"\t")
         fw.write("%s\t%s\t%s\t(best c = %s,g = %s,rate =%s)\n" %(c,g,rate,best_c,best_g,best_rate))
         fw.flush()
         print "%s %s %s (best c = %s,g = %s,rate =%s)\n" %(c,g,rate,best_c,best_g,best_rate)
