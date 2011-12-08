@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #_*_ coding: utf-8 _*_
 #author:张知临 zhzhl202@163.com
 #Filename: predict_model.py
