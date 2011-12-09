@@ -110,6 +110,8 @@ def ctm_predict_multi(filename,config_files,indexes_lists,result_save_path,resul
     fs = file(result_save_path,'w')    
     print "-----------------正在对样本进行预测-------------------"
     for line in f.readlines():
+        if len(line.strip())<1:
+            continue
         if change_decode ==True:
             line = line.decode(in_decode).encode(out_encode,'ignore')
         text = line.strip().split(tc_splitTag)
