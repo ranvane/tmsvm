@@ -13,6 +13,7 @@ import segment
 import math
 import measure
 import ctmutil
+import stem
 
 #def cal_sc(lab,m,text,dic_list,str_splitTag):
 #    '''输入标签，模型，待预测的文本，词典，以及词分词用的符号
@@ -61,6 +62,10 @@ def ctm_predict(filename,config_file,indexes,result_save_path,result_indexes,str
         segment_file = os.path.dirname(filename)+"/segmented"
         segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
+        
+    print "-----------------正在对源文本进行词干化处理-------------------"
+    stem.stemFile(filename,str_splitTag,tc_splitTag)
+    
     f= file(filename,'r')
     fs = file(result_save_path,'w')
     print "-----------------正在对样本进行预测-------------------"
@@ -105,7 +110,10 @@ def ctm_predict_multi(filename,config_files,indexes_lists,result_save_path,resul
         local_fun_list.append(local_fun)
         model_list.append(model)
         global_weight_list .append(global_weight)
-        
+
+    print "-----------------正在对源文本进行词干化处理-------------------"
+    stem.stemFile(filename,str_splitTag,tc_splitTag)
+            
     f= file(filename,'r')
     fs = file(result_save_path,'w')    
     print "-----------------正在对样本进行预测-------------------"

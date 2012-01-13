@@ -23,7 +23,7 @@ def file_seg(filename,indexes,out_filename,str_splitTag,tc_splitTag,type):
     f = open(filename,'r')
     fw = open(out_filename,'w')
     for line in f.readlines():
-        text = line.split(tc_splitTag)
+        text = line.strip().split(tc_splitTag)
         for i in range(len(text)):
             if indexes.count(i)>0:
                 fw.write(term_seg(text[i],str_splitTag,1)+tc_splitTag)

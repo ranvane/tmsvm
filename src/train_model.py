@@ -17,6 +17,7 @@ from feature_select import feature_select
 import grid_search_param 
 import os
 import time
+import stem
 
 def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config_name,dic_name,model_name,train_name,svm_type,param_name,ratio,delete,str_splitTag,tc_splitTag,seg,param_select,global_fun,local_fun,label_file):
     '''训练的自动化程序，分词,先进行特征选择，重新定义词典，根据新的词典，自动选择SVM最优的参数。
@@ -54,6 +55,7 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
             os.makedirs(os.path.join(main_save_path,"temp"))
     
     #设定SVM模型的类型。  
+    
     tms_svm.set_svm_type(svm_type)   
         
     #如果没有给出停用词的文件名，则默认不使用停用词
@@ -68,6 +70,10 @@ def ctm_train(filename,indexes,main_save_path,stopword_filename,svm_param,config
         segment_file = os.path.dirname(filename)+"/segmented"
         segment.file_seg(filename,indexes,segment_file,str_splitTag,tc_splitTag,seg)
         filename = segment_file
+    
+    #对原训练样本进行词干化处理
+    print "-----------------正在对源文本进行词干化处理-------------------"
+    stem.stemFile(filename,str_splitTag,tc_splitTag)
     
     print "-----------------现在正在进行特征选择---------------"  
     dic_path= os.path.join(main_save_path,"model",dic_name)    
