@@ -40,7 +40,7 @@ import tms
 5、计算从[0,1]区间内各个阈值下对应的F值、Recall、Precision，将结果保存在post.analysis
 '''
 tms.tms_train("../data/post.train",indexes=[1],main_save_path="../data/",stopword_filename="../data/stopwords.txt",svm_type="libsvm",svm_param="-t 2",config_name="title.config",dic_name="title.key",model_name="title.model",train_name="title.train",param_name="title.param",ratio=0.4,seg=1,local_fun="tf",global_fun="idf")
-tms.tms_train("../data/post.train",indexes=[1,2],main_save_path="../data/",stopword_filename="../data/stopwords.txt",svm_type="liblinear",config_name="title_content.config",dic_name="title_content.key",model_name="title_content.model",train_name="title_content.train",param_name="title_content.param",ratio=0.2,seg=1,local_fun="tf",global_fun="one")
-tms.tms_predict_multi("../data/post.test",config_files=["../data/model/title.config","../data/model/title_content.config"],indexes_lists=[[1],[1,2]],result_save_path="../data/post.result",result_indexes=[0],seg=1)
-tms.tms_analysis("../data/post.result",step=2,output_file="",indexes=[0,1,2],predicted_label_index=0,predicted_value_index=1,true_label_index=2)
-tms.tms_analysis("../data/post.result",step=4,output_file="../data/post.analysis",min=0,max=1,indexes=[0,1,2],predicted_label_index=0,predicted_value_index=1,true_label_index=2)
+#tms.tms_train("../data/post.train",indexes=[1,2],main_save_path="../data/",stopword_filename="../data/stopwords.txt",svm_type="liblinear",config_name="title_content.config",dic_name="title_content.key",model_name="title_content.model",train_name="title_content.train",param_name="title_content.param",ratio=0.2,seg=1,local_fun="tf",global_fun="one")
+#tms.tms_predict_multi("../data/post.test",config_files=["../data/model/title.config","../data/model/title_content.config"],indexes_lists=[[1],[1,2]],result_save_path="../data/post.result",result_indexes=[0],seg=1)
+#tms.tms_analysis("../data/post.result",step=2,output_file="",indexes=[0,1,2],predicted_label_index=0,predicted_value_index=1,true_label_index=2)
+#tms.tms_analysis("../data/post.result",step=4,output_file="../data/post.analysis",min=0,max=1,indexes=[0,1,2],predicted_label_index=0,predicted_value_index=1,true_label_index=2)
