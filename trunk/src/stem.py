@@ -18,7 +18,7 @@ def stemFile(filename,str_splitTag,tc_splitTag):
     f.close()    
         
 def stemWords(word):
-    return porter2.stem(word)
+    return porter2.stem(word).lower()
 
 def stemLine(words,str_splitTag):
     return str_splitTag.join([stemWords(word) for word in words.strip().split(str_splitTag)])

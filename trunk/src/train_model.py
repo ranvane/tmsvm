@@ -150,6 +150,10 @@ def cons_train_sample_for_cla(filename,indexs,local_fun,dic_path,sample_save_pat
     if type(local_fun)==types.StringType:
         local_fun = measure.local_f(local_fun)
     label = set()
+    #对原训练样本进行词干化处理
+    print "-----------------正在对源文本进行词干化处理-------------------"
+    stem.stemFile(filename,str_splitTag,tc_splitTag)    
+    
     f= file(filename,'r')
     fs = file(sample_save_path,'w')
     for line in f.readlines():
