@@ -7,11 +7,17 @@
 import sys
 import os
 add_path = (lambda x:sys.path.insert(0,x) if sys.path.count(x)<1 else "")
-add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../src"))
-add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../dependence"))
-add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../lsa_src"))
-add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"tools"))
-
+if sys.platform=='win32':
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../src"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../dependence"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"../lsa_src"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"tools"))
+else:
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"src"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"dependence"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"lsa_src"))
+    add_path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"tools"))
+    
 import train_model
 import predict_model
 import grid_search_param

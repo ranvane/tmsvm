@@ -121,7 +121,7 @@ def save_config(f,dic_name,model_name,local_fun,global_fun,seg,svm_type,svm_para
     f.write("LocalFun:"+str(local_fun).strip()+"\n")
     f.write("GlobalFun:"+str(global_fun).strip()+"\n")
     f.write("WordSeg:"+str(seg).strip()+"\n")
-    f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.gmtime())+"\n")
+    f.write("Date:"+time.strftime("%Y-%m-%d-%H-%M-%S",time.localtime(time.time()))+"\n")
     f.write("Labels:\n{\n") #将类标签写入，类标签会以"label,descr"进行存储
     if label_file.strip()!="":
         for line in file(label_file):
