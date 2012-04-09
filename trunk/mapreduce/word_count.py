@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-
 import sys
-sys.path.append('.')
+import os
 from hstream import *
+sys.path.append('.')
+import tms_svm
 
 def read_param(filename):
 	params=list()
@@ -10,7 +11,8 @@ def read_param(filename):
 		params.append(line.strip())
 	return params
 
-params= list()
+default_param_file="./params"
+params = read_param(default_param_file)
 
 class WordCount(HStream):
     '''word count example for Hadoop Streaming using hstream'''
@@ -26,6 +28,4 @@ class WordCount(HStream):
         self.write_output( key, str(length))
 
 if __name__ == '__main__':
-    global params
-    params=read_param("./data")
     WordCount()
