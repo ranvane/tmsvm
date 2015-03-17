@@ -1,4 +1,3 @@
-<div id="maincol">
 
 <table width="100%">
  <tbody><tr class="pscontent">
@@ -129,11 +128,4 @@ A text mining system based on svm.This system focus on text classification based
  </td>
  </tr>
 </tbody></table>
-<script src="https://ssl.gstatic.com/codesite/ph/17435595315869588898/js/prettify/prettify_core_compiled.js"></script>
-<script type="text/javascript">
- prettyPrint();
-</script>
 
- <script type="text/javascript" src="https://ssl.gstatic.com/codesite/ph/17435595315869588898/js/ph_core.js"></script>
-
-</div>
